@@ -54,11 +54,7 @@ jobs:
         run: |
           printf '%s\n' "$PRIVATE_KEY" > /tmp/key.pem
           sed -i 's/\r//' /tmp/key.pem
-          google-chrome-stable \
-            --pack-extension="$(pwd)/chrome-extension" \
-            --pack-extension-key=/tmp/key.pem \
-            --no-sandbox 2>&1
-          mv "$(pwd)/chrome-extension.crx" dist/creative-ai.crx
+          node scripts/sign-crx.js dist/creative-ai-chrome.zip /tmp/key.pem dist/creative-ai.crx
           rm -f /tmp/key.pem
           echo "CRX built: $(du -sh dist/creative-ai.crx)"
 
