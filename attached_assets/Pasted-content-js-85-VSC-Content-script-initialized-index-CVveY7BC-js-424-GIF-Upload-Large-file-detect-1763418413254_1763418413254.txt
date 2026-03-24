@@ -1,0 +1,22 @@
+content.js:85 [VSC] Content script initialized
+index-CVveY7BC.js:424 [GIF Upload] Large file detected (46.99MB), using chunked upload
+index-CVveY7BC.js:424 [GIF Upload] Uploading chunk 1/10 (5.00MB)
+index-CVveY7BC.js:424 [GIF Upload] Uploading chunk 2/10 (5.00MB)
+index-CVveY7BC.js:424 [GIF Upload] Uploading chunk 3/10 (5.00MB)
+index-CVveY7BC.js:424 [GIF Upload] Uploading chunk 4/10 (5.00MB)
+index-CVveY7BC.js:424 [GIF Upload] Uploading chunk 5/10 (5.00MB)
+index-CVveY7BC.js:424 [GIF Upload] Uploading chunk 6/10 (5.00MB)
+index-CVveY7BC.js:424 [GIF Upload] Uploading chunk 7/10 (5.00MB)
+index-CVveY7BC.js:424 [GIF Upload] Uploading chunk 8/10 (5.00MB)
+index-CVveY7BC.js:424 [GIF Upload] Uploading chunk 9/10 (5.00MB)
+index-CVveY7BC.js:424 [GIF Upload] Uploading chunk 10/10 (1.99MB)
+index-CVveY7BC.js:424 [GIF Upload] Chunked upload complete: /storage/84ba8af0-5f1e-48bb-942a-532f2ad0bf64.mp4
+gif-creator:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+gif-creator:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+gif-creator:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+gif-creator:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+gif-creator:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+gif-creator:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+gif-creator:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+gif-creator:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+84ba8af0-5f1e-48bb-942a-532f2ad0bf64.mp4:1  GET https://entremax-creativeai-studio.replit.app/storage/84ba8af0-5f1e-48bb-942a-532f2ad0bf64.mp4 500 (Internal Server Error)

@@ -1,0 +1,163 @@
+POST
+/api/v1/jobs/createTask
+Create Task
+Create a new generation task
+
+Request Parameters
+The API accepts a JSON payload with the following structure:
+
+Request Body Structure
+{
+  "model": "string",
+  "callBackUrl": "string (optional)",
+  "input": {
+    // Input parameters based on form configuration
+  }
+}
+Root Level Parameters
+model
+Required
+string
+The model name to use for generation
+
+Example:
+
+"gpt-image/1.5-image-to-image"
+callBackUrl
+Optional
+string
+Callback URL for task completion notifications. Optional parameter. If provided, the system will send POST requests to this URL when the task completes (success or failure). If not provided, no callback notifications will be sent.
+
+Example:
+
+"https://your-domain.com/api/callback"
+Input Object Parameters
+The input object contains the following parameters based on the form configuration:
+
+input.input_urls
+Required
+array(URL)
+Upload an image file to use as input for the API
+
+Please provide the URL of the uploaded file; Accepted types: image/jpeg, image/png, image/webp; Max size: 10.0MB
+Example:
+
+["https://static.aiquickdraw.com/tools/example/1765962794374_GhtqB9oX.webp"]
+input.prompt
+Required
+string
+A text description of the image you want to generate
+
+Max length: 3000 characters
+Example:
+
+"Change her clothing to an elegant blue evening gown. Preserve her face, identity, hairstyle, pose, body shape, background, lighting, and camera angle exactly as in the original image."
+input.aspect_ratio
+Required
+string
+Width-height ratio of the image, determining its visual form.
+
+Available options:
+
+1:1
+-
+1:1
+2:3
+-
+2:3
+3:2
+-
+3:2
+Example:
+
+"3:2"
+input.quality
+Required
+string
+Quality: medium=balanced, high=slow/detailed.
+
+Available options:
+
+medium
+-
+medium
+high
+-
+high
+Example:
+
+"medium"
+Request Example
+
+cURL
+
+JavaScript
+
+Python
+curl -X POST "https://api.kie.ai/api/v1/jobs/createTask" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -d '{
+    "model": "gpt-image/1.5-image-to-image",
+    "callBackUrl": "https://your-domain.com/api/callback",
+    "input": {
+      "input_urls": [
+        "https://static.aiquickdraw.com/tools/example/1765962794374_GhtqB9oX.webp"
+      ],
+      "prompt": "Change her clothing to an elegant blue evening gown. Preserve her face, identity, hairstyle, pose, body shape, background, lighting, and camera angle exactly as in the original image.",
+      "aspect_ratio": "3:2",
+      "quality": "medium"
+    }
+}'
+Response Example
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "taskId": "task_12345678"
+  }
+}
+Response Fields
+code
+Status code, 200 for success, others for failure
+message
+Response message, error description when failed
+data.taskId
+Task ID for querying task status
+Callback Notifications
+When you provide the callBackUrl parameter when creating a task, the system will send POST requests to the specified URL upon task completion (success or failure).
+
+Success Callback Example
+{
+    "code": 200,
+    "data": {
+        "completeTime": 1755599644000,
+        "costTime": 8,
+        "createTime": 1755599634000,
+        "model": "gpt-image/1.5-image-to-image",
+        "param": "{\"callBackUrl\":\"https://your-domain.com/api/callback\",\"model\":\"gpt-image/1.5-image-to-image\",\"input\":{\"input_urls\":[\"https://static.aiquickdraw.com/tools/example/1765962794374_GhtqB9oX.webp\"],\"prompt\":\"Change her clothing to an elegant blue evening gown. Preserve her face, identity, hairstyle, pose, body shape, background, lighting, and camera angle exactly as in the original image.\",\"aspect_ratio\":\"3:2\",\"quality\":\"medium\"}}",
+        "resultJson": "{\"resultUrls\":[\"https://example.com/generated-image.jpg\"]}",
+        "state": "success",
+        "taskId": "e989621f54392584b05867f87b160672",
+        "failCode": null,
+        "failMsg": null,
+    },
+    "msg": "Playground task completed successfully."
+}
+Failure Callback Example
+{
+    "code": 501,
+    "data": {
+        "completeTime": 1755597081000,
+        "costTime": 0,
+        "createTime": 1755596341000,
+        "failCode": "500",
+        "failMsg": "Internal server error",
+        "model": "gpt-image/1.5-image-to-image",
+        "param": "{\"callBackUrl\":\"https://your-domain.com/api/callback\",\"model\":\"gpt-image/1.5-image-to-image\",\"input\":{\"input_urls\":[\"https://static.aiquickdraw.com/tools/example/1765962794374_GhtqB9oX.webp\"],\"prompt\":\"Change her clothing to an elegant blue evening gown. Preserve her face, identity, hairstyle, pose, body shape, background, lighting, and camera angle exactly as in the original image.\",\"aspect_ratio\":\"3:2\",\"quality\":\"medium\"}}",
+        "state": "fail",
+        "taskId": "bd3a37c523149e4adf45a3ddb5faf1a8",
+        "resultJson": null,
+    },
+    "msg": "Playground task failed."
+}

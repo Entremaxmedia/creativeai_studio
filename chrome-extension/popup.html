@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creative AI</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <span class="header-title">Creative AI</span>
+    </div>
+    <div class="header-right">
+      <span id="selected-count" class="selected-badge hidden">0 selected</span>
+      <button id="refresh-btn" class="icon-btn" title="Refresh">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </button>
+      <button id="settings-btn" class="icon-btn" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Top-level tab nav: Library | Importer -->
+  <div class="toplevel-tabs">
+    <button id="main-tab-library" class="toplevel-tab" data-main-tab="library">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+      </svg>
+      Library
+    </button>
+    <button id="main-tab-importer" class="toplevel-tab active" data-main-tab="importer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      Importer
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SETTINGS PANEL                                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div id="settings-panel" class="panel hidden">
+    <div class="panel-title">Extension Settings</div>
+    <div class="field-group">
+      <label class="field-label">Backend URL</label>
+      <input id="settings-backend-url" type="url" class="input" placeholder="https://your-app.replit.app" />
+      <p class="field-hint">The URL of your Entremax app (no trailing slash)</p>
+    </div>
+    <div class="field-group">
+      <label class="field-label">API Key</label>
+      <input id="settings-api-key" type="password" class="input" placeholder="Your MTP_IMPORT_API_KEY" />
+      <p class="field-hint">Set this to match the MTP_IMPORT_API_KEY environment secret on your server</p>
+    </div>
+    <div class="settings-actions">
+      <button id="settings-test-btn" class="btn btn-secondary">Test Connection</button>
+      <button id="settings-save-btn" class="btn btn-primary">Save Settings</button>
+    </div>
+    <div id="settings-status" class="status-msg hidden"></div>
+
+    <div class="settings-separator"></div>
+
+    <div class="field-group">
+      <label class="field-label">Extension Version</label>
+      <div class="version-row">
+        <span id="settings-version" class="version-badge">v1.0.0</span>
+        <button id="check-update-btn" class="btn btn-secondary btn-sm">Check for Updates</button>
+      </div>
+      <div id="update-status" class="status-msg hidden"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- LIBRARY PANEL                                                           -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div id="library-panel" class="panel hidden">
+    <!-- Search + Folder filter -->
+    <div class="lib-controls">
+      <div class="lib-search-wrap">
+        <svg class="lib-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="lib-search" class="lib-search-input" placeholder="Search files..." />
+        <button id="lib-search-clear" class="lib-search-clear hidden" title="Clear search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="custom-select lib-folder-wrap" id="lib-folder-select-wrap">
+        <button class="select-btn lib-folder-btn" id="lib-folder-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span id="lib-folder-label">All folders</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dropdown hidden" id="lib-folder-dropdown">
+          <input type="text" class="dropdown-search" id="lib-folder-search" placeholder="Search folders..." />
+          <div class="dropdown-list" id="lib-folder-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Library sub-tabs: Images | Videos -->
+    <div class="tab-nav">
+      <button id="lib-tab-images" class="tab-btn active" data-lib-tab="images">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+        </svg>
+        Images
+        <span id="lib-images-count" class="tab-count"></span>
+      </button>
+      <button id="lib-tab-videos" class="tab-btn" data-lib-tab="videos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px">
+          <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+        </svg>
+        Videos
+        <span id="lib-videos-count" class="tab-count"></span>
+      </button>
+    </div>
+
+    <!-- Library states -->
+    <div id="lib-loading" class="empty-state">
+      <svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      <p>Loading library...</p>
+    </div>
+    <div id="lib-empty" class="empty-state hidden">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:32px;height:32px;opacity:0.4">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+      </svg>
+      <p id="lib-empty-text">No files found</p>
+    </div>
+
+    <!-- Library grid -->
+    <div id="lib-grid" class="lib-grid hidden"></div>
+
+    <!-- Pagination -->
+    <div id="lib-pagination" class="lib-pagination hidden">
+      <button id="lib-prev" class="lib-page-btn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:11px;height:11px"><polyline points="15 18 9 12 15 6"/></svg>
+        Prev
+      </button>
+      <span id="lib-page-info" class="lib-page-info">Page 1 of 1</span>
+      <button id="lib-next" class="lib-page-btn">
+        Next
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:11px;height:11px"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- IMPORTER PANEL                                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div id="main-panel" class="panel">
+    <!-- Naming Form -->
+    <div class="form-section">
+      <div class="form-row">
+        <div class="field-group field-group-sm">
+          <label class="field-label">Category *</label>
+          <div class="custom-select" id="cat-select-wrap">
+            <button class="select-btn" id="cat-btn">
+              <span id="cat-label">Select category...</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="dropdown hidden" id="cat-dropdown">
+              <input type="text" class="dropdown-search" id="cat-search" placeholder="Search or add..." />
+              <div class="dropdown-list" id="cat-list"></div>
+              <div class="dropdown-add hidden" id="cat-add-row">
+                <button class="add-btn" id="cat-add-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span id="cat-add-label">Add</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field-group field-group-sm">
+          <label class="field-label">Product/ID <span class="optional">(opt)</span></label>
+          <div class="custom-select" id="pid-select-wrap">
+            <button class="select-btn" id="pid-btn">
+              <span id="pid-label">Select...</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="dropdown hidden" id="pid-dropdown">
+              <input type="text" class="dropdown-search" id="pid-search" placeholder="Search or add..." />
+              <div class="dropdown-list" id="pid-list"></div>
+              <div class="dropdown-add hidden" id="pid-add-row">
+                <button class="add-btn" id="pid-add-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span id="pid-add-label">Add</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field-group field-group-sm">
+          <label class="field-label">Type *</label>
+          <div class="custom-select" id="type-select-wrap">
+            <button class="select-btn" id="type-btn" disabled>
+              <span id="type-label">Select type...</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="dropdown hidden" id="type-dropdown">
+              <input type="text" class="dropdown-search" id="type-search" placeholder="Search or add..." />
+              <div class="dropdown-list" id="type-list"></div>
+              <div class="dropdown-add hidden" id="type-add-row">
+                <button class="add-btn" id="type-add-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span id="type-add-label">Add</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field-group field-group-sm">
+          <label class="field-label">Variant <span class="optional">(opt)</span></label>
+          <input type="text" id="variant-input" class="input" placeholder="e.g. blue, v2" maxlength="20" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">
+          <svg class="inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Folder <span class="optional">(optional)</span>
+        </label>
+        <div class="folder-row">
+          <div class="custom-select flex-1" id="folder-select-wrap">
+            <button class="select-btn" id="folder-btn">
+              <span id="folder-label">Root (no folder)</span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="dropdown hidden" id="folder-dropdown">
+              <input type="text" class="dropdown-search" id="folder-search" placeholder="Search folders..." />
+              <div class="dropdown-list" id="folder-list"></div>
+            </div>
+          </div>
+          <button id="new-folder-btn" class="icon-btn" title="Create new folder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+          </button>
+        </div>
+        <div id="new-folder-row" class="new-folder-row hidden">
+          <input type="text" id="new-folder-name" class="input flex-1" placeholder="New folder name..." />
+          <button id="new-folder-confirm" class="btn btn-primary btn-sm">Create</button>
+          <button id="new-folder-cancel" class="btn btn-secondary btn-sm">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Convert to WebP option -->
+      <label class="form-option-row" id="webp-option-row">
+        <input type="checkbox" id="convert-webp" checked />
+        <span class="form-option-text">Convert images to WebP</span>
+        <span class="optional">(smaller files)</span>
+      </label>
+
+      <div id="filename-preview" class="filename-preview hidden">
+        <span class="preview-label">Filename: </span>
+        <code id="preview-text"></code>
+      </div>
+    </div>
+
+    <!-- Importer media tabs -->
+    <div class="tab-nav">
+      <button id="tab-images" class="tab-btn active" data-tab="images">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+        </svg>
+        Images
+        <span id="tab-images-count" class="tab-count"></span>
+      </button>
+      <button id="tab-videos" class="tab-btn" data-tab="videos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px">
+          <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+        </svg>
+        Videos
+        <span id="tab-videos-count" class="tab-count"></span>
+      </button>
+    </div>
+
+    <!-- Importer toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button id="select-all-btn" class="btn btn-ghost btn-sm">Select all</button>
+        <button id="select-none-btn" class="btn btn-ghost btn-sm">Clear</button>
+        <span id="image-count" class="count-label">Loading...</span>
+      </div>
+      <div class="toolbar-right">
+        <button id="upload-btn" class="btn btn-primary" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload to MTP
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loading-state" class="empty-state">
+      <svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      <p>Scanning page for media...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state hidden">
+      <svg id="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:32px;height:32px;opacity:0.4">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+      </svg>
+      <p id="empty-text">No images found on this page</p>
+      <button id="retry-btn" class="btn btn-secondary btn-sm" style="margin-top:8px">Retry</button>
+    </div>
+
+    <!-- Image grid -->
+    <div id="image-grid" class="media-grid hidden"></div>
+    <!-- Video grid -->
+    <div id="video-grid" class="media-grid hidden"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- UPLOAD MODAL                                                            -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div id="upload-modal" class="upload-modal hidden">
+    <div id="upload-modal-progress" class="upload-modal-panel">
+      <svg class="spin upload-modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      <div class="upload-modal-title">Uploading...</div>
+      <div id="upload-modal-sub" class="upload-modal-sub">Please wait</div>
+    </div>
+    <div id="upload-modal-done" class="upload-modal-panel hidden">
+      <div id="upload-modal-icon-done" class="upload-modal-result-icon success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div id="upload-modal-done-title" class="upload-modal-title">Upload complete!</div>
+      <div id="upload-modal-done-sub" class="upload-modal-sub"></div>
+      <div id="upload-modal-list" class="upload-modal-list"></div>
+      <a id="upload-modal-link" class="upload-modal-link"
+         href="https://entremax-creativeai-studio.replit.app/image-library"
+         target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;flex-shrink:0">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+        </svg>
+        See the files here
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;flex-shrink:0;opacity:.6">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+      </a>
+      <button id="upload-modal-close" class="btn btn-primary" style="margin-top:4px;width:100%">Done</button>
+    </div>
+  </div>
+
+  <!-- Video hover preview overlay -->
+  <div id="vid-preview-overlay" class="hover-preview-overlay vid-preview hidden">
+    <video id="vid-preview-el" muted autoplay loop playsinline></video>
+    <div class="vid-preview-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;flex-shrink:0"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Playing preview
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

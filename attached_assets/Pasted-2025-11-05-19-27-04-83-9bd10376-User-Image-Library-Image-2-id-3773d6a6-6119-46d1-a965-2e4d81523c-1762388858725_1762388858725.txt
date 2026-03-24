@@ -1,0 +1,164 @@
+2025-11-05 19:27:04.83
+9bd10376
+User
+[Image Library] Image 2 (id: 3773d6a6-6119-46d1-a965-2e4d81523c9c) has very large URL: 2048754 characters
+2025-11-05 19:27:04.83
+9bd10376
+User
+[Image Library] Image 3 (id: 0bdf30ff-0a52-4fc4-b972-ce12d88f7ba7) has very large URL: 2269906 characters
+2025-11-05 19:27:04.83
+9bd10376
+User
+[Image Library] Image 4 (id: 74790a0a-b3d0-4302-b6f6-5f4fa565951d) has very large URL: 2243374 characters
+2025-11-05 19:27:04.83
+9bd10376
+User
+[Image Library] Image 5 (id: 0c487708-12a7-4e1a-aaaa-83d9785d5140) has very large URL: 1751478 characters
+2025-11-05 19:27:04.83
+9bd10376
+User
+[Image Library] Image 6 (id: d86d214f-825f-4d09-9049-9371befb86a3) has very large URL: 2601706 characters
+2025-11-05 19:27:04.83
+9bd10376
+User
+[Image Library] Sending response...
+2025-11-05 19:27:04.97
+9bd10376
+User
+[Image Library] Response sent successfully
+2025-11-05 19:27:05.06
+9bd10376
+User
+12:27:05 AM [express] GET /api/saved-images 304 in 860ms :: {"success":true,"items":[{"id":"cd65728d-…
+2025-11-05 19:27:07.56
+9bd10376
+User
+[Image Library] Query params: page=1, limit=30, productId=none, includeUnsaved=true
+2025-11-05 19:27:07.56
+9bd10376
+User
+[getSavedImagesPaginated] Options: {"page":1,"limit":30,"productId":"none","includeUnsaved":true}
+2025-11-05 19:27:07.56
+9bd10376
+User
+[getSavedImagesPaginated] Conditions count: 1
+2025-11-05 19:27:07.56
+9bd10376
+User
+[getSavedImagesPaginated] Applying where clause with 1 condition(s)
+2025-11-05 19:27:07.58
+9bd10376
+User
+[getSavedImagesPaginated] Total images: 45
+2025-11-05 19:27:09.69
+9bd10376
+User
+[getSavedImagesPaginated] Retrieved 30 items
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Found 45 total images, returning 30 items for page 1/2
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 0 (id: cd65728d-072c-4efb-8c63-2666cf12ece6) has very large URL: 3329702 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 1 (id: 617f955f-bdf9-46de-beb8-cc45514bb447) has very large URL: 2380390 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 2 (id: 3c33bdb0-1784-4e95-b75f-8c6898973be0) has very large URL: 2563894 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 3 (id: f3faef0c-0c7f-4403-8fe5-238eb9956674) has very large URL: 2356398 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 4 (id: 5ff8e75f-c331-4fbc-a8e0-acd1deeb38c8) has very large URL: 2380390 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 5 (id: 73bd1228-38ff-4600-bcb3-08d91601f1a8) has very large URL: 2116390 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 7 (id: 72d65529-176a-4138-84ab-431668146dba) has very large URL: 2256650 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 8 (id: 2d971d99-0433-4d5e-8800-6be2cb4aebcd) has very large URL: 2502358 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 10 (id: 3773d6a6-6119-46d1-a965-2e4d81523c9c) has very large URL: 2048754 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 12 (id: 11df33f6-430a-4352-8bae-312bc772f583) has very large URL: 2139574 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 13 (id: e21fbb6e-3aa3-4b78-88b2-299575cebe03) has very large URL: 2111866 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 14 (id: 26ed1de4-d119-4faf-b164-269f0190e80d) has very large URL: 2048754 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 16 (id: c9a1862d-68ff-4ccd-9736-90099a324750) has very large URL: 2352806 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 17 (id: 0bdf30ff-0a52-4fc4-b972-ce12d88f7ba7) has very large URL: 2269906 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 18 (id: fc7eb805-458b-4608-a11a-23263afb2f7b) has very large URL: 2269906 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 19 (id: 3af60071-bae3-4034-b5d7-dfaee05cc40b) has very large URL: 2231682 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 20 (id: 913c7caa-b8c7-4e2a-a3b1-df383023ab1e) has very large URL: 1951318 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 22 (id: e3885718-c750-41ce-a643-9c799a8ec42e) has very large URL: 2246910 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 24 (id: 74790a0a-b3d0-4302-b6f6-5f4fa565951d) has very large URL: 2243374 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 25 (id: 16c7e5e9-842e-4351-a973-724a32a0d011) has very large URL: 3299746 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 27 (id: 6e715f50-d250-4e0e-82bd-b28d7f989abd) has very large URL: 2243374 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 28 (id: 74f7dd0e-d792-4985-a09e-7b27db5bd382) has very large URL: 3296338 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Image 29 (id: b6a904ed-2079-4a88-b041-cc56f49e3c4d) has very large URL: 2172530 characters
+2025-11-05 19:27:09.69
+9bd10376
+User
+[Image Library] Sending response...
+2025-11-05 19:27:10.10
+9bd10376
+User
+[Image Library] Response sent successfully
+2025-11-05 19:27:10.50
+9bd10376
+User
+12:27:10 AM [express] GET /api/saved-images 200 in 2667ms :: {"success":true,"items":[{"id":"cd65728d…

@@ -1,0 +1,15 @@
+Sizing & Dimensions
+Custom Dimensions: When creating a new design, you can enter exact pixel dimensions for your canvas. Resize (Magic Switch): Canva Pro users can use the "Resize" button on the toolbar to switch to preset social media dimensions (Instagram Story, Facebook Post, etc.) or enter custom dimensions. It auto-crops to fit the new aspect ratio. On-Canvas Resizing: When a video or image is placed on the canvas, you see a bounding box with round corner handles. Dragging corner handles resizes the content proportionally. Dragging side handles crops the content without changing its scale — this is non-destructive, so you can always readjust later.
+Cropping
+When you double-click a video or image on the canvas, you enter crop mode. You can drag the crop handles to define what portion of the content stays visible within the frame. You can also expand content beyond the canvas edges to focus on a specific detail and leave the rest outside the visible frame. Canva also has a dedicated "Crop" button in the toolbar for more precise control.
+The Timeline & Scrubbing
+Canva rolled out an updated multi-track timeline (replacing the old page-based structure) for all new video designs as of late 2025. Canva Here's how it works:
+Playhead: A vertical line showing your current position. You drag it left or right to scrub through your video — this is how you navigate frame by frame or find exact moments. Webeducationservices
+Time Ruler: Runs along the top of the timeline showing seconds and minutes for precise alignment. Canva
+Track Area: Where you place and arrange video clips, audio, and elements. There's a main track (thick bar) for your primary footage and upper tracks for overlays like text, graphics, and additional video layers. Canva
+Play Controls: Standard play/pause buttons to preview your project. Canva
+Zoom: You can zoom into the timeline for more precise timing control using a trackpad pinch gesture or Ctrl/Cmd + scroll. Canva
+Trimming
+From the Timeline: Hover over the start or end of a clip and trim handles appear. Click and drag them to set new in-points (trim from start) or out-points (trim from end). Bring Your Own Laptop The trimmed content is hidden, not deleted — it's non-destructive and you can always pull the handle back to recover footage.
+From the Toolbar: With a clip selected, click the Trim button (scissors icon with clip duration). A trim panel expands where you can drag handles on either side. Bring Your Own Laptop
+Splitting: Position the playhead where you want to cut, then either press "S" on your keyboard or click the split option. This divides the clip into two separate segments Bring Your Own Laptop that you can reorder, delete, or apply different effects to. Note: splitting is destructive — deleted segments are gone for good.

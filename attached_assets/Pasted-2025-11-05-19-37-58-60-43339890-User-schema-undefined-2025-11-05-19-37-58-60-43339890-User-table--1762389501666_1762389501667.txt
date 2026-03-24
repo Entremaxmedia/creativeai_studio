@@ -1,0 +1,164 @@
+2025-11-05 19:37:58.60
+43339890
+User
+schema: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+table: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+column: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+dataType: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+constraint: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+file: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+line: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+routine: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+sourceError: undefined
+2025-11-05 19:37:58.60
+43339890
+User
+}
+2025-11-05 19:37:58.60
+43339890
+User
+[getSavedImagesPaginated] Error: NeonDbError: Server error (HTTP status 507): {"message":"response is too large (max is 67108864 bytes)","code":"","detail":null,"hint":null,"position":null,"internalPosition":null,"internalQuery":null,"severity":"","where":null,"table":null,"column":null,"schema":null,"dataType":null,"constraint":null,"file":null,"line":null,"routine":null}
+2025-11-05 19:37:58.60
+43339890
+User
+at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1557:64)
+2025-11-05 19:37:58.60
+43339890
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-05 19:37:58.60
+43339890
+User
+at async NeonHttpPreparedQuery.execute (file:///home/runner/workspace/node_modules/drizzle-orm/neon-http/session.js:40:20)
+2025-11-05 19:37:58.60
+43339890
+User
+at async DbStorage.getSavedImagesPaginated (file:///home/runner/workspace/dist/index.js:460:25)
+2025-11-05 19:37:58.60
+43339890
+User
+at async file:///home/runner/workspace/dist/index.js:2662:24 {
+2025-11-05 19:37:58.60
+43339890
+User
+severity: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+code: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+detail: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+hint: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+position: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+internalPosition: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+internalQuery: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+where: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+schema: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+table: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+column: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+dataType: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+constraint: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+file: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+line: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+routine: undefined,
+2025-11-05 19:37:58.60
+43339890
+User
+sourceError: undefined
+2025-11-05 19:37:58.60
+43339890
+User
+}
+2025-11-05 19:37:58.60
+43339890
+User
+[getSavedImagesPaginated] Error details: {
+2025-11-05 19:37:58.60
+43339890
+User
+stack: 'NeonDbError: Server error (HTTP status 507): {"message":"response is too large (max is 67108864 bytes)","code":"","detail":null,"hint":null,"position":null,"internalPosition":null,"internalQuery":null,"severity":"","where":null,"table":null,"column":null,"schema":null,"dataType":null,"constraint":null,"file":null,"line":null,"routine":null}\n' +
+2025-11-05 19:37:58.60
+43339890
+User
+' at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1557:64)\n' +
+2025-11-05 19:37:58.60
+43339890
+User
+' at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+2025-11-05 19:37:58.60
+43339890
+User
+' at async NeonHttpPreparedQuery.execute (file:///home/runner/workspace/node_modules/drizzle-orm/neon-http/session.js:40:20)\n' +
+2025-11-05 19:37:58.60
+43339890
+User
+' at async DbStorage.getSavedImagesPaginated (file:///home/runner/workspace/dist/index.js:460:25)\n' +
+2025-11-05 19:37:58.60
+43339890
+User
+}

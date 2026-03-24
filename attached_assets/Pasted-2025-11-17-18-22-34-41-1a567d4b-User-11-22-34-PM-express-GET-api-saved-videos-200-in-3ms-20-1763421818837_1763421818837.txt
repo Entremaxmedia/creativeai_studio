@@ -1,0 +1,205 @@
+2025-11-17 18:22:34.41
+1a567d4b
+User
+11:22:34 PM [express] GET /api/saved-videos 200 in 3ms
+
+2025-11-17 18:22:37.61
+1a567d4b
+User
+[GIF Upload] Creating chunked upload session for 20250821_085803.mp4
+2025-11-17 18:22:37.61
+1a567d4b
+User
+[GIF Upload] Session created: 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:37.61
+1a567d4b
+User
+11:22:37 PM [express] POST /api/gif-conversions/chunked-upload/session 200 in 5ms :: {"success":true,…
+2025-11-17 18:22:37.98
+1a567d4b
+User
+[GIF Upload] Stored chunk 0 for session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:37.98
+1a567d4b
+User
+[GIF Upload] Received chunk 0 for session 20240f63-f568-4900-bd14-12ae37025b9b (5242880 bytes)
+2025-11-17 18:22:37.98
+1a567d4b
+User
+11:22:37 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 25ms :: {"success":true,"…
+2025-11-17 18:22:38.32
+1a567d4b
+User
+[GIF Upload] Received chunk 1 for session 20240f63-f568-4900-bd14-12ae37025b9b (5242880 bytes)
+2025-11-17 18:22:38.32
+1a567d4b
+User
+[GIF Upload] Stored chunk 1 for session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:38.32
+1a567d4b
+User
+11:22:38 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 24ms :: {"success":true,"…
+2025-11-17 18:22:38.76
+1a567d4b
+User
+[GIF Upload] Stored chunk 2 for session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:38.76
+1a567d4b
+User
+[GIF Upload] Received chunk 2 for session 20240f63-f568-4900-bd14-12ae37025b9b (5242880 bytes)
+2025-11-17 18:22:38.76
+1a567d4b
+User
+11:22:38 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 20ms :: {"success":true,"…
+2025-11-17 18:22:39.13
+1a567d4b
+User
+[GIF Upload] Received chunk 3 for session 20240f63-f568-4900-bd14-12ae37025b9b (5242880 bytes)
+2025-11-17 18:22:39.13
+1a567d4b
+User
+[GIF Upload] Stored chunk 3 for session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:39.13
+1a567d4b
+User
+11:22:39 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 40ms :: {"success":true,"…
+2025-11-17 18:22:39.44
+1a567d4b
+User
+[GIF Upload] Stored chunk 4 for session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:39.44
+1a567d4b
+User
+[GIF Upload] Received chunk 4 for session 20240f63-f568-4900-bd14-12ae37025b9b (5242880 bytes)
+2025-11-17 18:22:39.44
+1a567d4b
+User
+11:22:39 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 30ms :: {"success":true,"…
+2025-11-17 18:22:39.76
+1a567d4b
+User
+[GIF Upload] Received chunk 5 for session 20240f63-f568-4900-bd14-12ae37025b9b (5242880 bytes)
+2025-11-17 18:22:39.76
+1a567d4b
+User
+[GIF Upload] Stored chunk 5 for session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:39.76
+1a567d4b
+User
+11:22:39 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 15ms :: {"success":true,"…
+2025-11-17 18:22:40.10
+1a567d4b
+User
+[GIF Upload] Received chunk 6 for session 20240f63-f568-4900-bd14-12ae37025b9b (5242880 bytes)
+2025-11-17 18:22:40.10
+1a567d4b
+User
+[GIF Upload] Stored chunk 6 for session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:40.10
+1a567d4b
+User
+11:22:40 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 28ms :: {"success":true,"…
+2025-11-17 18:22:40.42
+1a567d4b
+User
+[GIF Upload] Received chunk 7 for session 20240f63-f568-4900-bd14-12ae37025b9b (5242880 bytes)
+2025-11-17 18:22:40.42
+1a567d4b
+User
+[GIF Upload] Stored chunk 7 for session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:40.42
+1a567d4b
+User
+11:22:40 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 17ms :: {"success":true,"…
+2025-11-17 18:22:40.71
+1a567d4b
+User
+[GIF Upload] Received chunk 8 for session 20240f63-f568-4900-bd14-12ae37025b9b (5242880 bytes)
+2025-11-17 18:22:40.71
+1a567d4b
+User
+[GIF Upload] Stored chunk 8 for session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:40.71
+1a567d4b
+User
+11:22:40 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 23ms :: {"success":true,"…
+2025-11-17 18:22:40.96
+1a567d4b
+User
+[GIF Upload] Received chunk 9 for session 20240f63-f568-4900-bd14-12ae37025b9b (2087349 bytes)
+2025-11-17 18:22:40.96
+1a567d4b
+User
+[GIF Upload] Last chunk received, assembling 10 chunks
+2025-11-17 18:22:40.96
+1a567d4b
+User
+[GIF Upload] Stored chunk 9 for session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:41.11
+1a567d4b
+User
+[GIF Upload] Assembled file size: 46.99MB
+2025-11-17 18:22:41.11
+1a567d4b
+User
+[GIF Upload] Uploading to storage: replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df/.private/generated/20240f63-f568-4900-bd14-12ae37025b9b.mp4
+2025-11-17 18:22:43.10
+1a567d4b
+User
+[GIF Upload] Upload complete, cleaned up session 20240f63-f568-4900-bd14-12ae37025b9b
+2025-11-17 18:22:43.10
+1a567d4b
+User
+[GIF Upload] Upload verified, file exists in storage
+2025-11-17 18:22:43.10
+1a567d4b
+User
+[GIF Upload] Upload complete, returning storage URL: /storage/20240f63-f568-4900-bd14-12ae37025b9b.mp4
+2025-11-17 18:22:43.10
+1a567d4b
+User
+11:22:43 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 2145ms :: {"success":true…
+2025-11-17 18:22:44.20
+1a567d4b
+User
+[Storage Route] Request for 20240f63-f568-4900-bd14-12ae37025b9b.mp4, Range: bytes=0-
+2025-11-17 18:22:44.20
+1a567d4b
+User
+[Storage Download] Attempting to download: /replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df/.private/generated/20240f63-f568-4900-bd14-12ae37025b9b.mp4
+2025-11-17 18:22:44.20
+1a567d4b
+User
+[Storage Download] Parsed as bucket: replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df, object: .private/generated/20240f63-f568-4900-bd14-12ae37025b9b.mp4
+2025-11-17 18:22:44.23
+1a567d4b
+User
+[Storage Download] File exists, serving: 20240f63-f568-4900-bd14-12ae37025b9b.mp4
+2025-11-17 18:22:44.23
+1a567d4b
+User
+[Storage Download] Fetching metadata for replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df/.private/generated/20240f63-f568-4900-bd14-12ae37025b9b.mp4
+2025-11-17 18:22:44.26
+1a567d4b
+User
+[Storage Download] Adding 2-second delay for storage stabilization
+2025-11-17 18:22:44.26
+1a567d4b
+User
+[Storage Download] Metadata retrieved successfully
+2025-11-17 18:22:44.26
+1a567d4b
+User
+[Storage Download] File metadata - size: 49273269, type: video/mp4
+2025-11-17 18:22:46.26
+1a567d4b
+User
+[Storage Download] Delay complete, proceeding with stream
+2025-11-17 18:22:46.26
+1a567d4b
+User
+[Storage Download] Streaming range 0-49273268 (49273269 bytes)
+2025-11-17 18:22:46.26
+1a567d4b
+User
+[Storage Download] Streaming range 0-49273268 (49273269 bytes)

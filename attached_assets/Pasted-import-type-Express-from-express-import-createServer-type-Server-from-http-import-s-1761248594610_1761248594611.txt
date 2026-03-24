@@ -1,0 +1,822 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
+
+// the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+const openai = new OpenAI({
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY
+});
+
+/*
+The newest Anthropic model is "claude-sonnet-4-20250514", not "claude-3-7-sonnet-20250219", "claude-3-5-sonnet-20241022" nor "claude-3-sonnet-20240229". 
+If the user doesn't specify a model, always prefer using "claude-sonnet-4-20250514" as it is the latest model.
+*/
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Suggest display name from manual content
+  app.post("/api/suggest-display-name", async (req, res) => {
+    try {
+      const { manualContent, internalName } = req.body;
+
+      if (!manualContent || manualContent.trim().length < 20) {
+        return res.json({ success: true, displayName: "" });
+      }
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [
+          {
+            role: "user",
+            content: `Based on this product sales content, extract the customer-facing product name that should appear in marketing emails.
+
+Internal name: ${internalName}
+
+Sales content:
+${manualContent}
+
+Rules:
+- Return ONLY the clean, customer-facing product name
+- Remove internal tags like "High Ticket", "Low Ticket", "F+S", etc.
+- Keep brand names and actual product model names
+- If the product is "Tacright GasMask High Ticket", return "Tacright GasMask"
+- If the product is "XYZ Knife F+S Deal", return "XYZ Knife"
+- Return a SHORT name (2-4 words max) that customers would recognize
+
+Return valid JSON:
+{
+  "displayName": "extracted name here"
+}`
+          }
+        ],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 100
+      });
+
+      const rawContent = completion.choices[0].message.content;
+      if (!rawContent) {
+        return res.json({ success: true, displayName: "" });
+      }
+
+      const result = JSON.parse(rawContent);
+      res.json({ success: true, displayName: result.displayName || "" });
+    } catch (error) {
+      console.error("Error suggesting display name:", error);
+      res.json({ success: true, displayName: "" }); // Fail silently
+    }
+  });
+
+  // Audit product offer link and extract key details
+  app.post("/api/audit-product", async (req, res) => {
+    try {
+      const { offerLink, productName, manualContent } = req.body;
+
+      // If manual content is provided and not empty, use it
+      const contentToAnalyze = manualContent && manualContent.trim().length > 0
+        ? `Product Name: ${productName}
+
+Manual Sales Page Content:
+${manualContent}
+
+Extract and return JSON with these fields:
+{
+  "price": "regular/retail price as string (e.g., '$189' or null)",
+  "salePrice": "sale/discounted price as string (or null if same as price)",
+  "features": ["array", "of", "product", "features/specs"],
+  "sellingPoints": ["array", "of", "key", "benefits", "or", "selling", "points"],
+  "urgency": "any urgency/scarcity messaging like 'Only 300 left' or 'Limited time' (or null)",
+  "targetAudience": "who this product is for (or null)"
+}`
+        : `Analyze this product page: ${offerLink}
+
+Product Name: ${productName}
+
+Extract and return JSON with these fields:
+{
+  "price": "regular/retail price as string (e.g., '$189' or null)",
+  "salePrice": "sale/discounted price as string (or null if same as price)",
+  "features": ["array", "of", "product", "features/specs"],
+  "sellingPoints": ["array", "of", "key", "benefits", "or", "selling", "points"],
+  "urgency": "any urgency/scarcity messaging like 'Only 300 left' or 'Limited time' (or null)",
+  "targetAudience": "who this product is for (or null)"
+}`;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [
+          {
+            role: "user",
+            content: contentToAnalyze
+          }
+        ],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 8000
+      });
+
+      console.log("Audit completion finish reason:", completion.choices[0].finish_reason);
+      const rawContent = completion.choices[0].message.content;
+      console.log("Audit raw content:", rawContent);
+
+      if (!rawContent) {
+        console.error("Audit returned no content!");
+        return res.json({ success: true, productDetails: { error: "AI returned no content" } });
+      }
+
+      const productDetails = JSON.parse(rawContent);
+      
+      res.json({ success: true, productDetails });
+    } catch (error) {
+      console.error("Error auditing product:", error);
+      res.status(500).json({ success: false, error: "Failed to audit product link" });
+    }
+  });
+
+  // Helper function to generate emails with Claude
+  async function generateEmailsWithClaude(
+    productName: string,
+    productDetails: any,
+    toneAngle: string,
+    customTone: string,
+    offerType: string,
+    offerLink: string,
+    winnerExamplesSection: string,
+    toneDescriptions: Record<string, string>
+  ) {
+    const systemPrompt = toneAngle === 'custom'
+      ? `Generate 5 marketing emails in JSON format.
+
+Tone: ${customTone}
+
+Requirements:
+- Varied lengths: 50-80, 120-150, 180-220, 80-120, 250-300 words
+- Include 2+ CTAs as <a href="[LINK]" style="color:#0066cc">anchor text</a>
+- Space CTAs 4+ lines apart
+
+Return JSON:
+{
+  "variations": [
+    {
+      "subjects": ["subject1", "subject2", "subject3"],
+      "body": "email body with HTML formatting"
+    }
+  ]
+}`
+      : `Generate 5 marketing emails in JSON format.
+
+Tone: ${toneDescriptions[toneAngle] || toneDescriptions['legendary-copywriters']}
+
+Requirements:
+- Varied lengths: 50-80, 120-150, 180-220, 80-120, 250-300 words
+- Include 2+ CTAs as <a href="[LINK]" style="color:#0066cc">anchor text</a>
+- Space CTAs 4+ lines apart
+
+Return JSON:
+{
+  "variations": [
+    {
+      "subjects": ["subject1", "subject2", "subject3"],
+      "body": "email body with HTML formatting"
+    }
+  ]
+}`;
+
+    const userPrompt = `Product: ${productName}
+Link: ${offerLink}
+
+${winnerExamplesSection}
+
+Product details:
+${JSON.stringify(productDetails, null, 2)}`;
+
+    const message = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 20000,
+      system: systemPrompt,
+      messages: [
+        {
+          role: "user",
+          content: userPrompt
+        }
+      ]
+    });
+
+    const rawContent = message.content[0].type === 'text' ? message.content[0].text : '';
+    console.log("Claude raw response:", rawContent);
+    
+    if (!rawContent) {
+      throw new Error("Claude returned no content");
+    }
+
+    // Claude may wrap JSON in markdown code fences - extract the JSON
+    let jsonContent = rawContent.trim();
+    
+    // Remove markdown code fences if present
+    if (jsonContent.startsWith('```json')) {
+      jsonContent = jsonContent.replace(/^```json\s*\n/, '').replace(/\n```\s*$/, '');
+    } else if (jsonContent.startsWith('```')) {
+      jsonContent = jsonContent.replace(/^```\s*\n/, '').replace(/\n```\s*$/, '');
+    }
+
+    const result = JSON.parse(jsonContent);
+    return result.variations || [];
+  }
+
+  // Generate 10 email variations using both GPT-5 and Claude
+  app.post("/api/generate-emails", async (req, res) => {
+    try {
+      const { productName, productDetails, toneAngle, customTone, offerType, offerLink, productId } = req.body;
+
+      // Fetch winning emails to learn from (prioritize by offer type, then product, then global)
+      let winningEmails = await storage.getWinningEmailsByOfferType(offerType, 5);
+      
+      // Fallback strategy if no offer-type winners exist
+      if (winningEmails.length === 0 && productId) {
+        // Try product-specific winners
+        winningEmails = await storage.getWinningEmailsByProduct(productId, 5);
+      }
+      
+      if (winningEmails.length === 0) {
+        // Fallback to global winners
+        winningEmails = await storage.getWinningEmails(5);
+      }
+      
+      // Build winner examples section - simplified to not override tone
+      let winnerExamplesSection = '';
+      if (winningEmails.length > 0) {
+        winnerExamplesSection = `
+Past winning emails for reference (learn from what worked):
+${winningEmails.map((email, idx) => `
+${idx + 1}. ${email.subjects?.[0] || email.subject}
+`).join('')}
+`;
+      }
+
+      const toneDescriptions: Record<string, string> = {
+        "legendary-copywriters": "Write emails in the tone of legendary copywriters",
+        "national-brands": "Write like national outdoor/survival/political brands (Bass Pro, YETI, NRA, Patagonia, Duluth) - rugged, patriotic, built-to-last messaging",
+        "high-performing": "Write high-performing direct response emails",
+        "current-events": "Tie the product to current events and news - create relevance and urgency based on what's happening now",
+        "you-won": "Use 'You Won!' angle - make the reader feel like a winner with special access/pricing",
+        "try-something-new": "Experimental/novel approaches - case studies, quizzes, breaking news angles, anything creative",
+        "review-based": "Write review-based emails featuring social proof and customer testimonials. Include AI-generated realistic reviews with believable numbers like 'over 20,000 sold', '4.8 stars from 12,000+ buyers', '9 out of 10 customers recommend'. Mix testimonial formats: use 2-3 short review quotes (1-2 sentences each) from different customers rather than one long review. Keep statistics credible (avoid outrageous claims). Lead with compelling review quotes and trust-building statistics before presenting the offer. Example structure: opening stat → customer quote 1 → feature/benefit → customer quote 2 → CTA.",
+        "story-time": "Write realistic, engaging story-based emails with a relatable 2-3 paragraph narrative that draws readers in before transitioning to the product. Use vivid details, conversational tone, and authentic scenarios that feel like a friend sharing an experience. The story should set up a problem or situation that the product naturally solves. After the story hook (roughly 60-100 words), smoothly transition with phrases like 'That's when I discovered...', 'Turns out...', or 'Here's what changed everything...' then present the product and CTA. The story must feel real and connect emotionally.",
+        "custom": customTone || "Use a unique, creative approach"
+      };
+
+      // No offer strategy rules - removed per user request
+
+      const systemMessage = toneAngle === 'custom' 
+        ? `Generate 5 marketing emails in JSON format.
+
+Tone: ${customTone}
+
+Requirements:
+- Varied lengths: 50-80, 120-150, 180-220, 80-120, 250-300 words
+- Include 2+ CTAs as <a href="[LINK]" style="color:#0066cc">anchor text</a>
+- Space CTAs 4+ lines apart
+
+Return JSON:
+{
+  "variations": [
+    {
+      "subjects": ["subject1", "subject2", "subject3"],
+      "body": "email body with HTML formatting"
+    }
+  ]
+}`
+        : `Generate 5 marketing emails in JSON format.
+
+Tone: ${toneDescriptions[toneAngle] || toneDescriptions['legendary-copywriters']}
+
+Requirements:
+- Varied lengths: 50-80, 120-150, 180-220, 80-120, 250-300 words
+- Include 2+ CTAs as <a href="[LINK]" style="color:#0066cc">anchor text</a>
+- Space CTAs 4+ lines apart
+
+Return JSON:
+{
+  "variations": [
+    {
+      "subjects": ["subject1", "subject2", "subject3"],
+      "body": "email body with HTML formatting"
+    }
+  ]
+}`;
+
+      // Call both GPT-5 and Claude in parallel for 10 total variations
+      const [gptResult, claudeResult] = await Promise.all([
+        // GPT-5 generation
+        (async () => {
+          try {
+            const completion = await openai.chat.completions.create({
+              model: "gpt-5",
+              messages: [
+                {
+                  role: "system",
+                  content: systemMessage
+                },
+                {
+                  role: "user",
+                  content: `Product: ${productName}
+Link: ${offerLink}
+
+${winnerExamplesSection}
+
+Product details:
+${JSON.stringify(productDetails, null, 2)}`
+                }
+              ],
+              response_format: { type: "json_object" },
+              max_completion_tokens: 20000
+            });
+
+            const rawContent = completion.choices[0].message.content;
+            console.log("GPT-5 raw response:", rawContent);
+            console.log("GPT-5 finish reason:", completion.choices[0].finish_reason);
+            
+            if (!rawContent) {
+              console.error("GPT-5 returned no content!");
+              return { variations: [], provider: 'gpt-5', error: 'No content' };
+            }
+
+            const result = JSON.parse(rawContent);
+            return { 
+              variations: result.variations || [], 
+              provider: 'gpt-5',
+              error: null
+            };
+          } catch (error: any) {
+            console.error("GPT-5 generation error:", error);
+            return { variations: [], provider: 'gpt-5', error: error?.message || 'Unknown error' };
+          }
+        })(),
+        // Claude generation
+        (async () => {
+          try {
+            const variations = await generateEmailsWithClaude(
+              productName,
+              productDetails,
+              toneAngle,
+              customTone,
+              offerType,
+              offerLink,
+              winnerExamplesSection,
+              toneDescriptions
+            );
+            return {
+              variations,
+              provider: 'claude',
+              error: null
+            };
+          } catch (error: any) {
+            console.error("Claude generation error:", error);
+            return { variations: [], provider: 'claude', error: error?.message || 'Unknown error' };
+          }
+        })()
+      ]);
+
+      console.log("GPT-5 variations count:", gptResult.variations.length);
+      console.log("Claude variations count:", claudeResult.variations.length);
+
+      // Return both sets of variations with provider labels
+      res.json({ 
+        success: true, 
+        gptVariations: gptResult.variations,
+        claudeVariations: claudeResult.variations,
+        errors: {
+          gpt: gptResult.error,
+          claude: claudeResult.error
+        }
+      });
+    } catch (error) {
+      console.error("Error generating emails:", error);
+      res.status(500).json({ success: false, error: "Failed to generate emails" });
+    }
+  });
+
+  // Reuse email creative for a new product
+  app.post("/api/reuse-email", async (req, res) => {
+    try {
+      const { emailId, productName, productDetails, offerType, offerLink } = req.body;
+
+      // Fetch the original email
+      const originalEmail = await storage.getEmail(emailId);
+      if (!originalEmail) {
+        return res.status(404).json({ success: false, error: "Original email not found" });
+      }
+
+      console.log("Reusing email:", emailId, "for product:", productName);
+
+      // Use AI to adapt the creative for the new product
+      const systemMessage = `You are adapting an existing email creative for a new product.
+
+CRITICAL RULES:
+1. PRESERVE the writing style, tone, structure, and creative approach of the original email
+2. KEEP the same email length (within 10 words)
+3. MAINTAIN the same paragraph structure and spacing
+4. SWAP OUT product-specific details:
+   - Product name
+   - Retail price/value
+   - Features and benefits (use new product's features but in same style)
+   - Links (use new product link)
+5. KEEP the creative angles, hooks, and persuasion techniques identical
+6. Use SECOND PERSON (you, your, you're)
+7. Include 2+ CTAs as: <a href="${offerLink}" style="color:#0066cc">Natural text</a>
+8. Use <strong>bold</strong>, <em>italic</em>, and <u>underline</u> for emphasis in the same way as original
+9. Use exactly 3 line breaks (\\n\\n\\n) between paragraphs
+
+Return JSON with this format:
+{
+  "subjects": ["subject1", "subject2", "subject3"],
+  "body": "adapted email body with formatting"
+}`;
+
+      const userMessage = `ORIGINAL EMAIL:
+Subject options: ${JSON.stringify(originalEmail.subjects || [originalEmail.subject])}
+Body: ${originalEmail.body}
+
+NEW PRODUCT TO ADAPT FOR:
+Product: ${productName}
+Offer Type: ${offerType}
+Link: ${offerLink}
+Price: ${productDetails.price || 'N/A'}
+Sale Price: ${productDetails.salePrice || 'N/A'}
+Features: ${productDetails.features?.join(', ') || 'N/A'}
+Benefits: ${productDetails.sellingPoints?.join(', ') || 'N/A'}
+Target Audience: ${productDetails.targetAudience || 'N/A'}
+${productDetails.urgency ? `Urgency: ${productDetails.urgency}` : ''}
+
+${offerType === 'free-plus-shipping' ? `IMPORTANT: This is a F+S offer. MUST prominently reference the ${productDetails.price} retail value since customers get it FREE (only paying shipping).` : ''}
+
+Adapt the original email for this new product. Keep the same creative style and structure, but swap in the new product details naturally.`;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [
+          {
+            role: "system",
+            content: systemMessage
+          },
+          {
+            role: "user",
+            content: userMessage
+          }
+        ],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 10000
+      });
+
+      console.log("Reuse completion object:", JSON.stringify(completion, null, 2));
+      console.log("Reuse finish reason:", completion.choices[0].finish_reason);
+      
+      const rawContent = completion.choices[0].message.content;
+      console.log("Reuse AI response:", rawContent);
+
+      if (!rawContent) {
+        console.error("AI returned no content! Full completion:", completion);
+        return res.json({ success: false, error: "AI returned no content" });
+      }
+
+      const result = JSON.parse(rawContent);
+      
+      if (!result.subjects || !result.body) {
+        return res.json({ success: false, error: "Invalid response format" });
+      }
+
+      res.json({ success: true, email: result });
+    } catch (error) {
+      console.error("Error reusing email:", error);
+      res.status(500).json({ success: false, error: "Failed to reuse email" });
+    }
+  });
+
+  // Save email to library
+  app.post("/api/emails", async (req, res) => {
+    try {
+      const emailData = req.body;
+      const savedEmail = await storage.createEmail(emailData);
+      res.json({ success: true, email: savedEmail });
+    } catch (error) {
+      console.error("Error saving email:", error);
+      res.status(500).json({ success: false, error: "Failed to save email" });
+    }
+  });
+
+  // Get all emails from library
+  app.get("/api/emails", async (req, res) => {
+    try {
+      const emails = await storage.getEmails();
+      res.json({ success: true, emails });
+    } catch (error) {
+      console.error("Error fetching emails:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch emails" });
+    }
+  });
+
+  // Get single email by ID
+  app.get("/api/emails/:id", async (req, res) => {
+    try {
+      const email = await storage.getEmail(req.params.id);
+      if (!email) {
+        return res.status(404).json({ success: false, error: "Email not found" });
+      }
+      res.json({ success: true, email });
+    } catch (error) {
+      console.error("Error fetching email:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch email" });
+    }
+  });
+
+  // Update email
+  app.patch("/api/emails/:id", async (req, res) => {
+    try {
+      const updatedEmail = await storage.updateEmail(req.params.id, req.body);
+      if (!updatedEmail) {
+        return res.status(404).json({ success: false, error: "Email not found" });
+      }
+      res.json({ success: true, email: updatedEmail });
+    } catch (error) {
+      console.error("Error updating email:", error);
+      res.status(500).json({ success: false, error: "Failed to update email" });
+    }
+  });
+
+  // Delete email
+  app.delete("/api/emails/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteEmail(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ success: false, error: "Email not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting email:", error);
+      res.status(500).json({ success: false, error: "Failed to delete email" });
+    }
+  });
+
+  // Create product
+  app.post("/api/products", async (req, res) => {
+    try {
+      const productData = req.body;
+      const savedProduct = await storage.createProduct(productData);
+      res.json({ success: true, product: savedProduct });
+    } catch (error) {
+      console.error("Error creating product:", error);
+      res.status(500).json({ success: false, error: "Failed to create product" });
+    }
+  });
+
+  // Get all products
+  app.get("/api/products", async (req, res) => {
+    try {
+      const products = await storage.getProducts();
+      res.json({ success: true, products });
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch products" });
+    }
+  });
+
+  // Get single product by ID
+  app.get("/api/products/:id", async (req, res) => {
+    try {
+      const product = await storage.getProduct(req.params.id);
+      if (!product) {
+        return res.status(404).json({ success: false, error: "Product not found" });
+      }
+      res.json({ success: true, product });
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch product" });
+    }
+  });
+
+  // Update product
+  app.patch("/api/products/:id", async (req, res) => {
+    try {
+      // Exclude createdAt and id from update (these should never be changed)
+      const { createdAt, id, ...updateData } = req.body;
+      const updatedProduct = await storage.updateProduct(req.params.id, updateData);
+      if (!updatedProduct) {
+        return res.status(404).json({ success: false, error: "Product not found" });
+      }
+      res.json({ success: true, product: updatedProduct });
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ success: false, error: "Failed to update product" });
+    }
+  });
+
+  // Delete product
+  app.delete("/api/products/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteProduct(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ success: false, error: "Product not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      res.status(500).json({ success: false, error: "Failed to delete product" });
+    }
+  });
+
+  // Analytics endpoint for specific offer type - Calculate performance metrics filtered by offer type
+  app.get("/api/analytics/offer-type/:offerType", async (req, res) => {
+    try {
+      const targetOfferType = req.params.offerType;
+      const allEmails = await storage.getEmails();
+      const allProducts = await storage.getProducts();
+
+      // Filter emails to only those associated with products of the target offer type
+      const filteredEmails = allEmails.filter(email => {
+        const emailProducts = allProducts.filter(p => email.productIds.includes(p.id));
+        return emailProducts.some(p => p.offerType === targetOfferType);
+      });
+
+      // Calculate overall stats for this offer type
+      const totalEmails = filteredEmails.length;
+      const winnerCount = filteredEmails.filter(e => e.status === 'winner').length;
+      const loserCount = filteredEmails.filter(e => e.status === 'loser').length;
+      const testingCount = filteredEmails.filter(e => e.status === 'testing').length;
+      const needsTestingCount = filteredEmails.filter(e => e.status === 'needs-testing').length;
+      const tested = winnerCount + loserCount;
+      const overallWinRate = tested > 0 ? Math.round((winnerCount / tested) * 100) : 0;
+
+      // Calculate win rate by tone (for this offer type only)
+      const toneStats: Record<string, { total: number; winners: number; losers: number; winRate: number }> = {};
+      
+      filteredEmails.forEach(email => {
+        const tone = email.tone || 'unknown';
+        if (!toneStats[tone]) {
+          toneStats[tone] = { total: 0, winners: 0, losers: 0, winRate: 0 };
+        }
+        toneStats[tone].total++;
+        if (email.status === 'winner') toneStats[tone].winners++;
+        if (email.status === 'loser') toneStats[tone].losers++;
+      });
+
+      // Calculate win rates (only for tones with at least one tested email)
+      Object.keys(toneStats).forEach(tone => {
+        const tested = toneStats[tone].winners + toneStats[tone].losers;
+        toneStats[tone].winRate = tested > 0 
+          ? Math.round((toneStats[tone].winners / tested) * 100) 
+          : 0;
+      });
+
+      // Find top performing tone for this offer type
+      const topTone = Object.entries(toneStats)
+        .filter(([_, stats]) => (stats.winners + stats.losers) >= 3) // At least 3 tested
+        .sort((a, b) => b[1].winRate - a[1].winRate)[0];
+
+      // Recent winners for this offer type
+      const recentWinners = filteredEmails
+        .filter(e => e.status === 'winner')
+        .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
+        .slice(0, 5);
+
+      const analytics = {
+        offerType: targetOfferType,
+        overall: {
+          total: totalEmails,
+          winners: winnerCount,
+          losers: loserCount,
+          testing: testingCount,
+          needsTesting: needsTestingCount,
+          tested,
+          winRate: overallWinRate,
+        },
+        byTone: toneStats,
+        topPerformer: topTone ? { tone: topTone[0], winRate: topTone[1].winRate } : null,
+        recentWinners,
+      };
+
+      res.json({ success: true, analytics });
+    } catch (error) {
+      console.error("Error calculating offer-type analytics:", error);
+      res.status(500).json({ success: false, error: "Failed to calculate analytics" });
+    }
+  });
+
+  // Analytics endpoint - Calculate performance metrics
+  app.get("/api/analytics", async (req, res) => {
+    try {
+      const allEmails = await storage.getEmails();
+      const allProducts = await storage.getProducts();
+
+      // Calculate overall stats
+      const totalEmails = allEmails.length;
+      const winnerCount = allEmails.filter(e => e.status === 'winner').length;
+      const loserCount = allEmails.filter(e => e.status === 'loser').length;
+      const testingCount = allEmails.filter(e => e.status === 'testing').length;
+      const needsTestingCount = allEmails.filter(e => e.status === 'needs-testing').length;
+
+      // Calculate win rate by tone
+      const toneStats: Record<string, { total: number; winners: number; losers: number; winRate: number }> = {};
+      
+      allEmails.forEach(email => {
+        const tone = email.tone || 'unknown';
+        if (!toneStats[tone]) {
+          toneStats[tone] = { total: 0, winners: 0, losers: 0, winRate: 0 };
+        }
+        toneStats[tone].total++;
+        if (email.status === 'winner') toneStats[tone].winners++;
+        if (email.status === 'loser') toneStats[tone].losers++;
+      });
+
+      // Calculate win rates (only for tones with at least one tested email)
+      Object.keys(toneStats).forEach(tone => {
+        const tested = toneStats[tone].winners + toneStats[tone].losers;
+        toneStats[tone].winRate = tested > 0 
+          ? Math.round((toneStats[tone].winners / tested) * 100) 
+          : 0;
+      });
+
+      // Calculate win rate by offer type
+      const offerTypeStats: Record<string, { total: number; winners: number; losers: number; winRate: number }> = {};
+      
+      allEmails.forEach(email => {
+        // Find the product(s) associated with this email
+        const emailProducts = allProducts.filter(p => email.productIds.includes(p.id));
+        
+        emailProducts.forEach(product => {
+          const offerType = product.offerType || 'unknown';
+          if (!offerTypeStats[offerType]) {
+            offerTypeStats[offerType] = { total: 0, winners: 0, losers: 0, winRate: 0 };
+          }
+          // Only count each email once per offer type (even if multiple products)
+          const alreadyCounted = offerTypeStats[offerType].total;
+          if (!alreadyCounted || !email.productIds.some(id => {
+            const p = allProducts.find(prod => prod.id === id && prod.offerType === offerType);
+            return p && allProducts.indexOf(p) < emailProducts.indexOf(product);
+          })) {
+            offerTypeStats[offerType].total++;
+            if (email.status === 'winner') offerTypeStats[offerType].winners++;
+            if (email.status === 'loser') offerTypeStats[offerType].losers++;
+          }
+        });
+      });
+
+      // Calculate win rates for offer types
+      Object.keys(offerTypeStats).forEach(offerType => {
+        const tested = offerTypeStats[offerType].winners + offerTypeStats[offerType].losers;
+        offerTypeStats[offerType].winRate = tested > 0 
+          ? Math.round((offerTypeStats[offerType].winners / tested) * 100) 
+          : 0;
+      });
+
+      // Find top performing tone
+      const topTone = Object.entries(toneStats)
+        .filter(([_, stats]) => (stats.winners + stats.losers) >= 3) // At least 3 tested
+        .sort((a, b) => b[1].winRate - a[1].winRate)[0];
+
+      // Recent winners for display
+      const recentWinners = allEmails
+        .filter(e => e.status === 'winner')
+        .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
+        .slice(0, 5);
+
+      res.json({
+        success: true,
+        analytics: {
+          overall: {
+            totalEmails,
+            winners: winnerCount,
+            losers: loserCount,
+            testing: testingCount,
+            needsTesting: needsTestingCount,
+            overallWinRate: (winnerCount + loserCount) > 0 
+              ? Math.round((winnerCount / (winnerCount + loserCount)) * 100) 
+              : 0,
+          },
+          byTone: toneStats,
+          byOfferType: offerTypeStats,
+          topPerformer: topTone ? {
+            tone: topTone[0],
+            winRate: topTone[1].winRate,
+            tested: topTone[1].winners + topTone[1].losers,
+          } : null,
+          recentWinners: recentWinners.map(w => ({
+            id: w.id,
+            subject: w.subjects?.[0] || w.subject,
+            tone: w.tone,
+            createdAt: w.createdAt,
+          })),
+        },
+      });
+    } catch (error) {
+      console.error("Error calculating analytics:", error);
+      res.status(500).json({ success: false, error: "Failed to calculate analytics" });
+    }
+  });
+
+  const httpServer = createServer(app);
+
+  return httpServer;
+}

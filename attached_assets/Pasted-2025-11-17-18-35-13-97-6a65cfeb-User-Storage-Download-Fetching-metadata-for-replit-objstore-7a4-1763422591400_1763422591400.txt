@@ -1,0 +1,128 @@
+2025-11-17 18:35:13.97
+6a65cfeb
+User
+[Storage Download] Fetching metadata for replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df/.private/generated/dc350e85-28c3-4948-b7cb-5a829e8e09fa.mp4
+2025-11-17 18:35:13.99
+6a65cfeb
+User
+[Storage Download] Metadata retrieved successfully
+2025-11-17 18:35:13.99
+6a65cfeb
+User
+[Storage Download] File metadata - size: 49273269, type: video/mp4
+2025-11-17 18:35:13.99
+6a65cfeb
+User
+[Storage Download] Generating signed URL for direct GCS access
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+at async sign (file:///home/runner/workspace/node_modules/@google-cloud/storage/build/esm/src/signer.js:113:35) {
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+at downloadFromStorage (file:///home/runner/workspace/dist/index.js:373:13)
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+name: 'SigningError'
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+}
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+[Storage Download] Error: Error: Signed URL generation failed: Cannot sign data without `client_email`.
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+at async file:///home/runner/workspace/dist/index.js:5296:7
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+at GoogleAuth.sign (/home/runner/workspace/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/googleauth.js:790:19)
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+[Storage Download] Failed to generate signed URL: Error: Cannot sign data without `client_email`.
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+}
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+' at async file:///home/runner/workspace/dist/index.js:5296:7',
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+objectId: 'dc350e85-28c3-4948-b7cb-5a829e8e09fa.mp4'
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+stack: 'Error: Signed URL generation failed: Cannot sign data without `client_email`.\n' +
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+message: 'Signed URL generation failed: Cannot sign data without `client_email`.',
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+' at downloadFromStorage (file:///home/runner/workspace/dist/index.js:373:13)\n' +
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+code: undefined,
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+' at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+[Storage Download] Error details: {
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+[Storage Download] Error details: {
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+' at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+code: undefined,
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+' at downloadFromStorage (file:///home/runner/workspace/dist/index.js:373:13)\n' +
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+message: 'Signed URL generation failed: Cannot sign data without `client_email`.',
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+stack: 'Error: Signed URL generation failed: Cannot sign data without `client_email`.\n' +
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+objectId: 'dc350e85-28c3-4948-b7cb-5a829e8e09fa.mp4'
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+' at async file:///home/runner/workspace/dist/index.js:5296:7',
+2025-11-17 18:35:14.00
+6a65cfeb
+User
+}

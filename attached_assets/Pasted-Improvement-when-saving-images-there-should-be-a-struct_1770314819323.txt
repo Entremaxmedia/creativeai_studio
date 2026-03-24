@@ -1,0 +1,57 @@
+Improvement: when saving images, there should be a structured naming convention for them, as opposed to an open field text box. 
+
+Full Naming Convention Structure
+{category}-{product-id}-{type}-{variant}-{sequence}
+Category Prefix (Required)
+product - Product photography
+adcreative - Ad images/graphics
+element - Reusable design elements (badges, icons, textures)
+lifestyle - Lifestyle/contextual shots
+template - Design templates
+Product/Campaign ID (When Applicable)
+Use your SKU or internal product code
+For ads, use platform abbreviation: fb, yt, rum
+For campaigns: short campaign identifier
+Type Descriptor (Required)
+Products: null, photo, graphic, mockup, review
+Ads: hero, variation, testimonial, comparison
+Elements: badge, icon, texture, logo
+Variant (Optional but Recommended)
+Color, angle, setting, or specific differentiator
+Keep to 1-2 words, hyphenated: front, black, outdoor, guarantee
+Sequence Number (Required)
+Always 2 digits: 01, 02, etc.
+Dropdown Fields (Searchable with Add New option):
+Category - Searchable dropdown with ability to add new categories
+Product/Campaign ID - Searchable dropdown showing existing IDs with ability to add new
+Type - Searchable dropdown (options change based on category selected) with ability to add new types
+Sequence - Auto-incremented, but editable
+Text Input Field: 5. Variant - Free-form text input (optional)
+Each dropdown should:
+Allow searching/filtering existing options as you type
+Show "Add new: [your input]" option if what you're typing doesn't exist
+Save new entries for future use, and ensure these are formatted correctly so it won’t break the image link
+This keeps consistency while allowing flexibility to add new products, campaign IDs, or type descriptors as your business evolves.
+Examples
+Products:
+product-tf101-null-front-01.jpg
+product-tf101-photo-black-02.jpg
+product-tf101-review-screenshot-01.jpg
+product-tf101-mockup-lifestyle-03.jpg
+product-bb200-graphic-features-01.png
+Ad Creatives:
+adcreative-fb-trauma-hero-01.jpg
+adcreative-yt-bugout-variation-02.jpg
+adcreative-rum-mystery-testimonial-01.jpg
+adcreative-fb-tactical-comparison-03.jpg
+Elements:
+element-badge-guarantee-01.png
+element-icon-shipping-01.png
+element-texture-camo-01.jpg
+element-logo-entremax-01.png
+Lifestyle:
+lifestyle-outdoor-hiking-01.jpg
+lifestyle-tactical-range-02.jpg
+Templates:
+template-fb-square-01.psd
+template-story-vertical-01.psd

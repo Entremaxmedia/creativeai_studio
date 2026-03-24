@@ -1,0 +1,50 @@
+
+
+Okay now for email generation I have some adjustments to your instructions.
+
+Adjust the tone descriptions to the following:
+Legendary Copywriters: "Write emails in the tone of legendary copywriters"
+
+National Brands: "Write like national outdoor/survival/political brands (Bass Pro, YETI, NRA, Patagonia, Duluth) - rugged, patriotic, built-to-last messaging"
+
+High-Performing: "Write high-performing direct response emails"
+
+Current Events: "Tie the product to current events and news - create relevance and urgency based on what's happening now"
+
+You Won!: "Use 'You Won!' angle - make the reader feel like a winner with special access/pricing"
+
+Try Something New: "Experimental/novel approaches - case studies, quizzes, breaking news angles, anything creative"
+
+Review Based: "Write review-based emails featuring social proof and customer testimonials. Include AI-generated realistic reviews with believable numbers like 'over 20,000 sold', '4.8 stars from 12,000+ buyers', '9 out of 10 customers recommend'. Mix testimonial formats: use 2-3 short review quotes (1-2 sentences each) from different customers rather than one long review. Keep statistics credible (avoid outrageous claims). Lead with compelling review quotes and trust-building statistics before presenting the offer."
+
+Story-Time: "Write realistic, engaging story-based emails with a relatable 2-3 paragraph narrative that draws readers in before transitioning to the product. Use vivid details, conversational tone, and authentic scenarios that feel like a friend sharing an experience. The story should set up a problem or situation that the product naturally solves. After the story hook (roughly 60-100 words), smoothly transition with phrases like 'That's when I discovered...', 'Turns out...', or 'Here's what changed everything...' then present the product and CTA. The story must feel real and connect emotionally."
+
+Custom: [Uses your exact custom instructions]
+
+adjust the STRUCTURE & FORMATTING RULES to the following:
+
+- Varied lengths: 50-80, 120-150, 180-220, 80-120, 250-300 words
+- 2+ CTAs as: <a href="[LINK]" style="color:#0066cc">Natural text</a>
+- Space CTAs 4+ lines apart
+
+*important note* these ai generations naturally include styling like bold, italics, and underlining, but you have to maintain those styles when importing the generated content.
+
+adjust the LANGUAGE QUALITY GUARDRAIL to the following:
+Before finalizing each email, verify:
+✓ CTA anchor text is natural and varied (not repetitive "Click here")
+
+Remove the FEATURE VARIATION REQUIREMENT since the ai should naturally do this.
+
+adjust the PRODUCT DETAILS PROVIDED instructions to the following:
+
+[paste the entire sales content that is manually provided] - nothing else.
+
+
+Remove Offer Strategy rules for now for both F+S & Straight sale offers
+
+Adjust the CRITICAL VARIATION RULES to the following
+
+Return valid JSON.
+
+
+

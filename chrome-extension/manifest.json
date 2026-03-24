@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Creative AI",
+  "version": "1.0.0",
+  "description": "Browse your Creative AI media library and import images & videos from any page directly into MTP-Images",
+  "permissions": ["activeTab", "storage", "scripting", "sidePanel"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_title": "Creative AI",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": []
+}

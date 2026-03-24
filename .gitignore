@@ -1,0 +1,16 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+uploads/
+.local/
+tmp/
+public/gif-conversions/
+public/videos/
+public/images/
+generated_videos/
+attached_assets/*.mp4
+attached_assets/*.mov
+attached_assets/*.webm

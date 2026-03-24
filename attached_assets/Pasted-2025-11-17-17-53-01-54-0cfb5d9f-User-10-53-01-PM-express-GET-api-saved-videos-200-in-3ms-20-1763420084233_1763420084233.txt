@@ -1,0 +1,177 @@
+2025-11-17 17:53:01.54
+0cfb5d9f
+User
+10:53:01 PM [express] GET /api/saved-videos 200 in 3ms
+
+2025-11-17 17:53:04.94
+0cfb5d9f
+User
+[GIF Upload] Creating chunked upload session for 20250821_085803.mp4
+2025-11-17 17:53:04.94
+0cfb5d9f
+User
+[GIF Upload] Session created: c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:04.95
+0cfb5d9f
+User
+10:53:04 PM [express] POST /api/gif-conversions/chunked-upload/session 200 in 4ms :: {"success":true,…
+2025-11-17 17:53:05.29
+0cfb5d9f
+User
+[GIF Upload] Stored chunk 0 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:05.29
+0cfb5d9f
+User
+[GIF Upload] Received chunk 0 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e (5242880 bytes)
+2025-11-17 17:53:05.29
+0cfb5d9f
+User
+10:53:05 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 18ms :: {"success":true,"…
+2025-11-17 17:53:05.88
+0cfb5d9f
+User
+[GIF Upload] Received chunk 1 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e (5242880 bytes)
+2025-11-17 17:53:05.89
+0cfb5d9f
+User
+[GIF Upload] Stored chunk 1 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:05.89
+0cfb5d9f
+User
+10:53:05 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 20ms :: {"success":true,"…
+2025-11-17 17:53:06.26
+0cfb5d9f
+User
+[GIF Upload] Received chunk 2 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e (5242880 bytes)
+2025-11-17 17:53:06.26
+0cfb5d9f
+User
+[GIF Upload] Stored chunk 2 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:06.27
+0cfb5d9f
+User
+10:53:06 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 21ms :: {"success":true,"…
+2025-11-17 17:53:06.64
+0cfb5d9f
+User
+[GIF Upload] Stored chunk 3 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:06.64
+0cfb5d9f
+User
+[GIF Upload] Received chunk 3 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e (5242880 bytes)
+2025-11-17 17:53:06.64
+0cfb5d9f
+User
+10:53:06 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 44ms :: {"success":true,"…
+2025-11-17 17:53:06.94
+0cfb5d9f
+User
+[GIF Upload] Received chunk 4 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e (5242880 bytes)
+2025-11-17 17:53:06.94
+0cfb5d9f
+User
+[GIF Upload] Stored chunk 4 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:06.94
+0cfb5d9f
+User
+10:53:06 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 21ms :: {"success":true,"…
+2025-11-17 17:53:07.29
+0cfb5d9f
+User
+[GIF Upload] Received chunk 5 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e (5242880 bytes)
+2025-11-17 17:53:07.29
+0cfb5d9f
+User
+[GIF Upload] Stored chunk 5 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:07.29
+0cfb5d9f
+User
+10:53:07 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 33ms :: {"success":true,"…
+2025-11-17 17:53:07.65
+0cfb5d9f
+User
+[GIF Upload] Stored chunk 6 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:07.65
+0cfb5d9f
+User
+[GIF Upload] Received chunk 6 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e (5242880 bytes)
+2025-11-17 17:53:07.65
+0cfb5d9f
+User
+10:53:07 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 56ms :: {"success":true,"…
+2025-11-17 17:53:07.97
+0cfb5d9f
+User
+[GIF Upload] Received chunk 7 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e (5242880 bytes)
+2025-11-17 17:53:07.97
+0cfb5d9f
+User
+[GIF Upload] Stored chunk 7 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:07.97
+0cfb5d9f
+User
+10:53:07 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 16ms :: {"success":true,"…
+2025-11-17 17:53:08.32
+0cfb5d9f
+User
+[GIF Upload] Stored chunk 8 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:08.32
+0cfb5d9f
+User
+[GIF Upload] Received chunk 8 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e (5242880 bytes)
+2025-11-17 17:53:08.32
+0cfb5d9f
+User
+10:53:08 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 13ms :: {"success":true,"…
+2025-11-17 17:53:08.60
+0cfb5d9f
+User
+[GIF Upload] Stored chunk 9 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:08.60
+0cfb5d9f
+User
+[GIF Upload] Received chunk 9 for session c97a41e1-a0e9-4afe-9a26-4c4afced883e (2087349 bytes)
+2025-11-17 17:53:08.60
+0cfb5d9f
+User
+[GIF Upload] Last chunk received, assembling 10 chunks
+2025-11-17 17:53:08.74
+0cfb5d9f
+User
+[GIF Upload] Assembled file size: 46.99MB
+2025-11-17 17:53:08.74
+0cfb5d9f
+User
+[GIF Upload] Uploading to storage: replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df/.private/generated/c97a41e1-a0e9-4afe-9a26-4c4afced883e.mp4
+2025-11-17 17:53:11.61
+0cfb5d9f
+User
+[GIF Upload] Upload verified, file exists in storage
+2025-11-17 17:53:11.61
+0cfb5d9f
+User
+[GIF Upload] Upload complete, cleaned up session c97a41e1-a0e9-4afe-9a26-4c4afced883e
+2025-11-17 17:53:11.61
+0cfb5d9f
+User
+[GIF Upload] Upload complete, returning storage URL: /storage/c97a41e1-a0e9-4afe-9a26-4c4afced883e.mp4
+2025-11-17 17:53:11.61
+0cfb5d9f
+User
+10:53:11 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 3012ms :: {"success":true…
+2025-11-17 17:53:12.69
+0cfb5d9f
+User
+[Storage Download] Parsed as bucket: replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df, object: .private/generated/c97a41e1-a0e9-4afe-9a26-4c4afced883e.mp4
+2025-11-17 17:53:12.69
+0cfb5d9f
+User
+[Storage Route] Request for c97a41e1-a0e9-4afe-9a26-4c4afced883e.mp4, Range: bytes=0-
+2025-11-17 17:53:12.69
+0cfb5d9f
+User
+[Storage Download] Attempting to download: /replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df/.private/generated/c97a41e1-a0e9-4afe-9a26-4c4afced883e.mp4
+2025-11-17 17:53:12.76
+0cfb5d9f
+User
+[Storage Download] File exists, serving: c97a41e1-a0e9-4afe-9a26-4c4afced883e.mp4

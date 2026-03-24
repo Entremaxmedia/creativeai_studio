@@ -1,0 +1,185 @@
+2025-11-17 18:02:52.76
+b18f8d16
+User
+[GIF Upload] Creating chunked upload session for 20250821_085803.mp4
+
+2025-11-17 18:02:52.76
+b18f8d16
+User
+[GIF Upload] Session created: 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:52.76
+b18f8d16
+User
+11:02:52 PM [express] POST /api/gif-conversions/chunked-upload/session 200 in 3ms :: {"success":true,…
+2025-11-17 18:02:53.16
+b18f8d16
+User
+[GIF Upload] Received chunk 0 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea (5242880 bytes)
+2025-11-17 18:02:53.16
+b18f8d16
+User
+[GIF Upload] Stored chunk 0 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:53.16
+b18f8d16
+User
+11:02:53 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 9ms :: {"success":true,"c…
+2025-11-17 18:02:53.48
+b18f8d16
+User
+[GIF Upload] Received chunk 1 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea (5242880 bytes)
+2025-11-17 18:02:53.48
+b18f8d16
+User
+[GIF Upload] Stored chunk 1 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:53.48
+b18f8d16
+User
+11:02:53 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 8ms :: {"success":true,"c…
+2025-11-17 18:02:53.81
+b18f8d16
+User
+[GIF Upload] Stored chunk 2 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:53.81
+b18f8d16
+User
+[GIF Upload] Received chunk 2 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea (5242880 bytes)
+2025-11-17 18:02:53.81
+b18f8d16
+User
+11:02:53 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 9ms :: {"success":true,"c…
+2025-11-17 18:02:54.13
+b18f8d16
+User
+[GIF Upload] Received chunk 3 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea (5242880 bytes)
+2025-11-17 18:02:54.13
+b18f8d16
+User
+[GIF Upload] Stored chunk 3 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:54.13
+b18f8d16
+User
+11:02:54 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 14ms :: {"success":true,"…
+2025-11-17 18:02:54.47
+b18f8d16
+User
+[GIF Upload] Received chunk 4 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea (5242880 bytes)
+2025-11-17 18:02:54.47
+b18f8d16
+User
+[GIF Upload] Stored chunk 4 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:54.47
+b18f8d16
+User
+11:02:54 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 16ms :: {"success":true,"…
+2025-11-17 18:02:54.91
+b18f8d16
+User
+[GIF Upload] Stored chunk 5 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:54.91
+b18f8d16
+User
+[GIF Upload] Received chunk 5 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea (5242880 bytes)
+2025-11-17 18:02:54.91
+b18f8d16
+User
+11:02:54 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 11ms :: {"success":true,"…
+2025-11-17 18:02:55.24
+b18f8d16
+User
+[GIF Upload] Received chunk 6 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea (5242880 bytes)
+2025-11-17 18:02:55.24
+b18f8d16
+User
+[GIF Upload] Stored chunk 6 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:55.24
+b18f8d16
+User
+11:02:55 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 8ms :: {"success":true,"c…
+2025-11-17 18:02:55.55
+b18f8d16
+User
+[GIF Upload] Received chunk 7 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea (5242880 bytes)
+2025-11-17 18:02:55.55
+b18f8d16
+User
+[GIF Upload] Stored chunk 7 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:55.55
+b18f8d16
+User
+11:02:55 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 6ms :: {"success":true,"c…
+2025-11-17 18:02:55.87
+b18f8d16
+User
+[GIF Upload] Stored chunk 8 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:55.87
+b18f8d16
+User
+[GIF Upload] Received chunk 8 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea (5242880 bytes)
+2025-11-17 18:02:55.87
+b18f8d16
+User
+11:02:55 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 10ms :: {"success":true,"…
+2025-11-17 18:02:56.15
+b18f8d16
+User
+[GIF Upload] Stored chunk 9 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:56.15
+b18f8d16
+User
+[GIF Upload] Received chunk 9 for session 089b2ae7-5965-4836-aa6a-87ab66ff5fea (2087349 bytes)
+2025-11-17 18:02:56.15
+b18f8d16
+User
+[GIF Upload] Last chunk received, assembling 10 chunks
+2025-11-17 18:02:56.18
+b18f8d16
+User
+[GIF Upload] Assembled file size: 46.99MB
+2025-11-17 18:02:56.18
+b18f8d16
+User
+[GIF Upload] Uploading to storage: replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df/.private/generated/089b2ae7-5965-4836-aa6a-87ab66ff5fea.mp4
+2025-11-17 18:02:57.85
+b18f8d16
+User
+[GIF Upload] Upload verified, file exists in storage
+2025-11-17 18:02:57.85
+b18f8d16
+User
+[GIF Upload] Upload complete, cleaned up session 089b2ae7-5965-4836-aa6a-87ab66ff5fea
+2025-11-17 18:02:57.85
+b18f8d16
+User
+[GIF Upload] Upload complete, returning storage URL: /storage/089b2ae7-5965-4836-aa6a-87ab66ff5fea.mp4
+2025-11-17 18:02:57.85
+b18f8d16
+User
+11:02:57 PM [express] POST /api/gif-conversions/chunked-upload/chunk 200 in 1701ms :: {"success":true…
+2025-11-17 18:02:58.95
+b18f8d16
+User
+[Storage Download] Attempting to download: /replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df/.private/generated/089b2ae7-5965-4836-aa6a-87ab66ff5fea.mp4
+2025-11-17 18:02:58.95
+b18f8d16
+User
+[Storage Route] Request for 089b2ae7-5965-4836-aa6a-87ab66ff5fea.mp4, Range: bytes=0-
+2025-11-17 18:02:58.95
+b18f8d16
+User
+[Storage Download] Parsed as bucket: replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df, object: .private/generated/089b2ae7-5965-4836-aa6a-87ab66ff5fea.mp4
+2025-11-17 18:02:58.98
+b18f8d16
+User
+[Storage Download] File exists, serving: 089b2ae7-5965-4836-aa6a-87ab66ff5fea.mp4
+2025-11-17 18:02:58.98
+b18f8d16
+User
+[Storage Download] Fetching metadata for replit-objstore-7a4a8a72-131f-4d9f-bf23-6b014e20c0df/.private/generated/089b2ae7-5965-4836-aa6a-87ab66ff5fea.mp4
+2025-11-17 18:02:59.01
+b18f8d16
+User
+[Storage Download] File metadata - size: 49273269, type: video/mp4
+2025-11-17 18:02:59.01
+b18f8d16
+User
+[Storage Download] Downloading range 0-49273268 (49273269 bytes)

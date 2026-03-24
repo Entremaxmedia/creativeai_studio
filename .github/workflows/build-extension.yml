@@ -1,0 +1,151 @@
+name: Build & Release Extension
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Read version from manifest
+        id: ver
+        run: |
+          VERSION=$(node -p "require('./chrome-extension/manifest.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building version $VERSION"
+
+      - name: Patch manifest with update_url
+        run: |
+          PAGES_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('chrome-extension/manifest.json', 'utf8'));
+            m.update_url = '${PAGES_URL}/updates.xml';
+            fs.writeFileSync('chrome-extension/manifest.json', JSON.stringify(m, null, 2));
+          "
+
+      - name: Install zip
+        run: sudo apt-get install -y zip
+
+      - name: Build Chrome zip
+        run: |
+          mkdir -p dist
+          cd chrome-extension
+          zip -r ../dist/creative-ai-chrome.zip . \
+            --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
+
+      - name: Sign Chrome CRX
+        uses: cardinalby/webext-buildtools-chrome-crx-action@v2
+        with:
+          zipFilePath: dist/creative-ai-chrome.zip
+          crxFilePath: dist/creative-ai.crx
+          privateKey: ${{ secrets.CRX_PRIVATE_KEY }}
+
+      - name: Build Edge zip
+        run: |
+          cp -r chrome-extension /tmp/edge-ext
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('/tmp/edge-ext/manifest.json', 'utf8'));
+            delete m.side_panel;
+            m.permissions = m.permissions.filter(p => p !== 'sidePanel');
+            m.action = { ...m.action, default_popup: 'popup.html' };
+            fs.writeFileSync('/tmp/edge-ext/manifest.json', JSON.stringify(m, null, 2));
+          "
+          cd /tmp/edge-ext
+          zip -r $GITHUB_WORKSPACE/dist/creative-ai-edge.zip . \
+            --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
+
+      - name: Build Opera zip
+        run: |
+          cp -r chrome-extension /tmp/opera-ext
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('/tmp/opera-ext/manifest.json', 'utf8'));
+            delete m.side_panel;
+            m.permissions = m.permissions.filter(p => p !== 'sidePanel');
+            m.action = { ...m.action, default_popup: 'popup.html' };
+            fs.writeFileSync('/tmp/opera-ext/manifest.json', JSON.stringify(m, null, 2));
+          "
+          cd /tmp/opera-ext
+          zip -r $GITHUB_WORKSPACE/dist/creative-ai-opera.zip . \
+            --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
+
+      - name: Build Vivaldi zip (same as Chrome)
+        run: cp dist/creative-ai-chrome.zip dist/creative-ai-vivaldi.zip
+
+      - name: Build Safari zip (popup mode)
+        run: |
+          cp -r chrome-extension /tmp/safari-ext
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('/tmp/safari-ext/manifest.json', 'utf8'));
+            delete m.side_panel;
+            m.permissions = m.permissions.filter(p => p !== 'sidePanel');
+            m.action = { ...m.action, default_popup: 'popup.html' };
+            fs.writeFileSync('/tmp/safari-ext/manifest.json', JSON.stringify(m, null, 2));
+          "
+          cd /tmp/safari-ext
+          zip -r $GITHUB_WORKSPACE/dist/creative-ai-safari.zip . \
+            --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
+
+      - name: Generate updates.xml and prepare GitHub Pages
+        run: |
+          OWNER="${{ github.repository_owner }}"
+          REPO="${{ github.event.repository.name }}"
+          VERSION="${{ steps.ver.outputs.version }}"
+          EXT_ID="${{ secrets.CHROME_EXTENSION_ID }}"
+          mkdir -p pages
+          cat > pages/updates.xml << XML
+          <?xml version='1.0' encoding='UTF-8'?>
+          <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+            <app appid='${EXT_ID}'>
+              <updatecheck codebase='https://${OWNER}.github.io/${REPO}/creative-ai.crx' version='${VERSION}' />
+            </app>
+          </gupdate>
+          XML
+          cp dist/creative-ai.crx pages/creative-ai.crx
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./pages
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: "Creative AI Extension v${{ steps.ver.outputs.version }}"
+          body: |
+            ## Install instructions
+
+            **Auto-updating install (Chrome/Edge/Vivaldi):**
+            Download `creative-ai.crx`, open `chrome://extensions`, enable Developer mode, then drag and drop the `.crx` file onto the page. Chrome will auto-update this install silently.
+
+            **Manual install (all browsers):**
+            Download the `.zip` for your browser, extract it, go to `chrome://extensions` (or equivalent), enable Developer mode, click "Load unpacked", and select the extracted folder.
+
+            **Safari:**
+            Download `creative-ai-safari.zip`, extract it, then run `xcrun safari-web-extension-converter ./creative-ai-safari` in Terminal to convert it for Safari via Xcode.
+          files: |
+            dist/creative-ai-chrome.zip
+            dist/creative-ai-edge.zip
+            dist/creative-ai-opera.zip
+            dist/creative-ai-vivaldi.zip
+            dist/creative-ai-safari.zip
+            dist/creative-ai.crx
