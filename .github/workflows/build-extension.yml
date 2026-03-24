@@ -144,7 +144,7 @@ jobs:
           publish_dir: ./pages
 
       - name: Copy policy files to dist
-        run: cp policy/windows-install.reg policy/mac-install.sh dist/
+        run: cp policy/windows-install.reg policy/mac-install.sh policy/windows-install-edge.reg policy/mac-install-edge.sh policy/windows-install-vivaldi.reg policy/mac-install-vivaldi.sh dist/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -174,3 +174,7 @@ jobs:
             dist/creative-ai.crx
             dist/windows-install.reg
             dist/mac-install.sh
+            dist/windows-install-edge.reg
+            dist/mac-install-edge.sh
+            dist/windows-install-vivaldi.reg
+            dist/mac-install-vivaldi.sh

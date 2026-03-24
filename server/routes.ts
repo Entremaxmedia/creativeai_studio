@@ -8108,6 +8108,29 @@ Return valid JSON:
     }
   });
 
+  // Serve enterprise policy install scripts for Chrome, Edge, Vivaldi
+  app.get("/api/chrome-extension/policy", (req, res) => {
+    const browser = ((req.query.browser as string) || 'chrome').toLowerCase();
+    const os = ((req.query.os as string) || 'mac').toLowerCase();
+    const policyBrowsers = ['chrome', 'edge', 'vivaldi'];
+    const policyOses = ['windows', 'mac'];
+    if (!policyBrowsers.includes(browser) || !policyOses.includes(os)) {
+      return res.status(400).json({ error: 'Invalid browser or os parameter.' });
+    }
+    const suffix = browser === 'chrome' ? '' : `-${browser}`;
+    const filename = os === 'windows'
+      ? `windows-install${suffix}.reg`
+      : `mac-install${suffix}.sh`;
+    const filePath = path.join(process.cwd(), 'policy', filename);
+    if (!fsSync.existsSync(filePath)) {
+      return res.status(404).json({ error: 'Policy file not found.' });
+    }
+    const contentType = os === 'windows' ? 'application/octet-stream' : 'text/x-sh';
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Type', contentType);
+    res.sendFile(filePath);
+  });
+
   // Lightweight auth-check endpoint for Chrome Extension "Test Connection"
   // Returns 200 if API key is valid, 401 if not, 503 if not configured.
   app.get("/api/mtp-images/auth-check", (req, res) => {

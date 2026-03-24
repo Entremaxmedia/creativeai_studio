@@ -1,11 +1,24 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Download } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Download, RefreshCw } from "lucide-react";
 import { SiOpera, SiVivaldi } from "react-icons/si";
+
+/* ── OS detection ──────────────────────────────────────────────────────────── */
+
+function detectOS(): 'windows' | 'mac' | 'other' {
+  const p = navigator.platform.toUpperCase();
+  if (p.includes('WIN')) return 'windows';
+  if (p.includes('MAC')) return 'mac';
+  return 'other';
+}
+
+/* ── Download helpers ──────────────────────────────────────────────────────── */
 
 function downloadExtension(browser: string) {
   const link = document.createElement('a');
@@ -16,19 +29,25 @@ function downloadExtension(browser: string) {
   document.body.removeChild(link);
 }
 
-/* ── Multi-color browser logos ─────────────────────────────────────────────── */
+function downloadPolicy(browser: string, os: 'windows' | 'mac') {
+  const link = document.createElement('a');
+  link.href = `/api/chrome-extension/policy?browser=${browser}&os=${os}`;
+  const ext = os === 'windows' ? 'reg' : 'sh';
+  const suffix = browser === 'chrome' ? '' : `-${browser}`;
+  link.download = `${os === 'windows' ? 'windows' : 'mac'}-install${suffix}.${ext}`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+/* ── Browser logos ─────────────────────────────────────────────────────────── */
 
 const ChromeLogo = ({ size = 28 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 100 100">
-    {/* Red segment: center → top → clockwise 120° → lower-right */}
     <path d="M50 50 L50 10 A40 40 0 0 1 84.64 70 Z" fill="#EA4335" />
-    {/* Yellow segment: center → lower-right → clockwise 120° → lower-left */}
     <path d="M50 50 L84.64 70 A40 40 0 0 1 15.36 70 Z" fill="#FBBC04" />
-    {/* Green segment: center → lower-left → clockwise 120° → top */}
     <path d="M50 50 L15.36 70 A40 40 0 0 1 50 10 Z" fill="#34A853" />
-    {/* White donut ring */}
     <circle cx="50" cy="50" r="27" fill="white" />
-    {/* Blue center */}
     <circle cx="50" cy="50" r="18" fill="#4285F4" />
   </svg>
 );
@@ -45,35 +64,8 @@ const EdgeLogo = ({ size = 28 }: { size?: number }) => (
         <stop offset="100%" stopColor="#004FA3" />
       </linearGradient>
     </defs>
-    {/* Main wave body */}
-    <path fill="url(#edgeA)" d="
-      M50 6
-      C74 6 93 25 93 49
-      C93 73 74 92 50 92
-      C36 92 23 86 14 76
-      C20 78 28 80 36 80
-      C56 80 70 67 70 50
-      C70 39 62 30 50 30
-      L28 30
-      C20 30 14 36 14 44
-      C14 52 20 58 28 58
-      L40 58
-      C37 66 26 72 12 66
-      C6 54 7 36 16 24
-      C26 12 37 6 50 6 Z
-    " />
-    {/* Inner darker wave to create the 'e' cutout effect */}
-    <path fill="url(#edgeB)" d="
-      M50 18
-      C67 18 80 31 80 48
-      C80 58 75 66 66 71
-      C70 64 72 57 72 50
-      C72 37 62 26 50 26
-      C38 26 28 36 28 48
-      L22 48
-      C22 38 30 26 40 21
-      C43 19 46 18 50 18 Z
-    " />
+    <path fill="url(#edgeA)" d="M50 6 C74 6 93 25 93 49 C93 73 74 92 50 92 C36 92 23 86 14 76 C20 78 28 80 36 80 C56 80 70 67 70 50 C70 39 62 30 50 30 L28 30 C20 30 14 36 14 44 C14 52 20 58 28 58 L40 58 C37 66 26 72 12 66 C6 54 7 36 16 24 C26 12 37 6 50 6 Z" />
+    <path fill="url(#edgeB)" d="M50 18 C67 18 80 31 80 48 C80 58 75 66 66 71 C70 64 72 57 72 50 C72 37 62 26 50 26 C38 26 28 36 28 48 L22 48 C22 38 30 26 40 21 C43 19 46 18 50 18 Z" />
   </svg>
 );
 
@@ -87,28 +79,22 @@ const SafariLogo = ({ size = 28 }: { size?: number }) => {
           <stop offset="100%" stopColor="#1476F2" />
         </linearGradient>
       </defs>
-      {/* Background circle */}
       <circle cx="50" cy="50" r="48" fill="url(#safariGrad)" />
       <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
-      {/* Compass tick marks */}
       {ticks.map((deg) => {
         const rad = ((deg - 90) * Math.PI) / 180;
         const cardinal = deg % 90 === 0;
         const r1 = cardinal ? 36 : 39;
         return (
-          <line
-            key={deg}
+          <line key={deg}
             x1={50 + r1 * Math.cos(rad)} y1={50 + r1 * Math.sin(rad)}
             x2={50 + 44 * Math.cos(rad)} y2={50 + 44 * Math.sin(rad)}
             stroke="white" strokeWidth={cardinal ? 2.5 : 1.5} strokeLinecap="round"
           />
         );
       })}
-      {/* Red needle (NE — rotated 45°) */}
       <polygon points="50,50 47,66 53,66" fill="#FF3B30" transform="rotate(45 50 50)" />
-      {/* White needle (SW — opposite) */}
       <polygon points="50,50 47,34 53,34" fill="white" transform="rotate(45 50 50)" />
-      {/* Center pivot */}
       <circle cx="50" cy="50" r="3.5" fill="white" />
     </svg>
   );
@@ -116,14 +102,27 @@ const SafariLogo = ({ size = 28 }: { size?: number }) => {
 
 /* ── Browser config ─────────────────────────────────────────────────────────── */
 
-const BROWSERS = [
+type BrowserId = 'chrome' | 'edge' | 'vivaldi' | 'opera' | 'safari';
+
+type BrowserConfig = {
+  id: BrowserId;
+  name: string;
+  LogoComponent: React.FC<{ size?: number }>;
+  panel: string;
+  autoInstall: boolean;
+  manualUrl: string;
+  manualSteps: React.ReactNode[];
+};
+
+const BROWSERS: BrowserConfig[] = [
   {
     id: 'chrome',
     name: 'Chrome',
     LogoComponent: ChromeLogo,
-    extensionsUrl: 'chrome://extensions',
     panel: 'Side Panel',
-    steps: [
+    autoInstall: true,
+    manualUrl: 'chrome://extensions',
+    manualSteps: [
       'Download the zip and unzip it',
       <>Go to <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">chrome://extensions</code></>,
       'Enable Developer Mode, click "Load unpacked"',
@@ -134,24 +133,12 @@ const BROWSERS = [
     id: 'edge',
     name: 'Edge',
     LogoComponent: EdgeLogo,
-    extensionsUrl: 'edge://extensions',
     panel: 'Side Panel',
-    steps: [
+    autoInstall: true,
+    manualUrl: 'edge://extensions',
+    manualSteps: [
       'Download the zip and unzip it',
       <>Go to <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">edge://extensions</code></>,
-      'Enable Developer Mode, click "Load unpacked"',
-      'Select the unzipped folder',
-    ],
-  },
-  {
-    id: 'opera',
-    name: 'Opera',
-    LogoComponent: ({ size }: { size?: number }) => <SiOpera size={size} color="#FF1B2D" />,
-    extensionsUrl: 'opera://extensions',
-    panel: 'Popup',
-    steps: [
-      'Download the zip and unzip it',
-      <>Go to <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">opera://extensions</code></>,
       'Enable Developer Mode, click "Load unpacked"',
       'Select the unzipped folder',
     ],
@@ -160,11 +147,26 @@ const BROWSERS = [
     id: 'vivaldi',
     name: 'Vivaldi',
     LogoComponent: ({ size }: { size?: number }) => <SiVivaldi size={size} color="#EF3939" />,
-    extensionsUrl: 'vivaldi://extensions',
     panel: 'Side Panel',
-    steps: [
+    autoInstall: true,
+    manualUrl: 'vivaldi://extensions',
+    manualSteps: [
       'Download the zip and unzip it',
       <>Go to <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">vivaldi://extensions</code></>,
+      'Enable Developer Mode, click "Load unpacked"',
+      'Select the unzipped folder',
+    ],
+  },
+  {
+    id: 'opera',
+    name: 'Opera',
+    LogoComponent: ({ size }: { size?: number }) => <SiOpera size={size} color="#FF1B2D" />,
+    panel: 'Popup',
+    autoInstall: false,
+    manualUrl: 'opera://extensions',
+    manualSteps: [
+      'Download the zip and unzip it',
+      <>Go to <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">opera://extensions</code></>,
       'Enable Developer Mode, click "Load unpacked"',
       'Select the unzipped folder',
     ],
@@ -173,16 +175,154 @@ const BROWSERS = [
     id: 'safari',
     name: 'Safari',
     LogoComponent: SafariLogo,
-    extensionsUrl: 'Safari Settings → Extensions',
     panel: 'Popup',
-    steps: [
+    autoInstall: false,
+    manualUrl: 'Safari Settings → Extensions',
+    manualSteps: [
       'Download the zip and unzip it',
-      <>Requires Xcode on Mac. Run: <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">xcrun safari-web-extension-converter ./creative-ai-safari</code></>,
+      <>Requires Xcode. Run: <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">xcrun safari-web-extension-converter ./creative-ai-safari</code></>,
       'Build & run in Xcode, then open Safari',
       'Go to Settings → Extensions and enable it',
     ],
   },
-] as const;
+];
+
+/* ── Browser card ───────────────────────────────────────────────────────────── */
+
+function BrowserCard({ browser }: { browser: BrowserConfig }) {
+  const detectedOS = detectOS();
+  const defaultOS: 'windows' | 'mac' = detectedOS === 'windows' ? 'windows' : 'mac';
+  const [selectedOS, setSelectedOS] = useState<'windows' | 'mac'>(defaultOS);
+  const [showManual, setShowManual] = useState(false);
+
+  const { id, name, LogoComponent, panel, autoInstall, manualSteps } = browser;
+
+  return (
+    <div className="flex flex-col gap-3 rounded-md border bg-muted/30 p-4">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <LogoComponent size={28} />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-semibold text-sm leading-tight">{name}</p>
+            {autoInstall && (
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+                <RefreshCw className="w-2.5 h-2.5 mr-1" />
+                Auto-updates
+              </Badge>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground leading-tight mt-0.5">
+            Opens as: <span className="text-foreground/70">{panel}</span>
+          </p>
+        </div>
+      </div>
+
+      {/* Auto-install section */}
+      {autoInstall ? (
+        <div className="space-y-2.5">
+          {/* OS toggle */}
+          <div className="flex rounded-md border overflow-hidden text-xs">
+            <button
+              className={`flex-1 py-1 transition-colors ${selectedOS === 'windows' ? 'bg-primary text-primary-foreground font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+              onClick={() => setSelectedOS('windows')}
+              data-testid={`button-os-windows-${id}`}
+            >
+              Windows
+            </button>
+            <button
+              className={`flex-1 py-1 transition-colors ${selectedOS === 'mac' ? 'bg-primary text-primary-foreground font-medium' : 'text-muted-foreground hover:text-foreground'}`}
+              onClick={() => setSelectedOS('mac')}
+              data-testid={`button-os-mac-${id}`}
+            >
+              Mac
+            </button>
+          </div>
+
+          {/* Steps */}
+          <ol className="text-xs text-muted-foreground space-y-1 pl-1">
+            <li>1. Click "Download install script" below</li>
+            {selectedOS === 'windows' ? (
+              <>
+                <li>2. Double-click the downloaded <code className="font-mono bg-muted px-1 py-0.5 rounded">.reg</code> file</li>
+                <li>3. Click <strong className="text-foreground/80">Yes</strong> on the prompt</li>
+              </>
+            ) : (
+              <>
+                <li>2. Open Terminal and run:</li>
+                <li className="pl-2">
+                  <code className="font-mono bg-muted px-1 py-0.5 rounded break-all">
+                    bash ~/Downloads/mac-install{id === 'chrome' ? '' : `-${id}`}.sh
+                  </code>
+                </li>
+                <li>3. Enter your Mac password when asked</li>
+              </>
+            )}
+            <li>{selectedOS === 'windows' ? '4' : '4'}. Quit {name} and reopen it — extension installs automatically</li>
+          </ol>
+
+          <Button
+            size="sm"
+            className="gap-2 w-full"
+            onClick={() => downloadPolicy(id, selectedOS)}
+            data-testid={`button-policy-${id}-${selectedOS}`}
+          >
+            <Download className="w-3.5 h-3.5" />
+            Download install script ({selectedOS === 'windows' ? 'Windows' : 'Mac'})
+          </Button>
+
+          {/* Manual toggle */}
+          <button
+            className="text-xs text-muted-foreground underline underline-offset-2 w-full text-center"
+            onClick={() => setShowManual(v => !v)}
+            data-testid={`button-toggle-manual-${id}`}
+          >
+            {showManual ? 'Hide' : 'Show'} manual install (no auto-updates)
+          </button>
+
+          {showManual && (
+            <div className="space-y-2 pt-1 border-t">
+              <ol className="text-xs text-muted-foreground space-y-1 pl-1">
+                {manualSteps.map((step, i) => (
+                  <li key={i}>{i + 1}. {step}</li>
+                ))}
+              </ol>
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-2 w-full"
+                onClick={() => downloadExtension(id)}
+                data-testid={`button-download-${id}`}
+              >
+                <Download className="w-3.5 h-3.5" />
+                Download zip for {name}
+              </Button>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Manual-only install (Opera, Safari) */
+        <div className="space-y-2">
+          <ol className="text-xs text-muted-foreground space-y-1 pl-1">
+            {manualSteps.map((step, i) => (
+              <li key={i}>{i + 1}. {step}</li>
+            ))}
+          </ol>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2 w-full mt-auto"
+            onClick={() => downloadExtension(id)}
+            data-testid={`button-download-${id}`}
+          >
+            <Download className="w-3.5 h-3.5" />
+            Download for {name}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ── Page ───────────────────────────────────────────────────────────────────── */
 
@@ -246,38 +386,13 @@ export default function SettingsPage() {
           <CardTitle>Browser Extension</CardTitle>
           <CardDescription>
             Scrape and import images &amp; videos from any webpage directly into your MTP-Images library.
-            Download the version for your browser and follow the steps below.
+            Chrome, Edge, and Vivaldi support automatic silent updates — run the install script once and you're done.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {BROWSERS.map(({ id, name, LogoComponent, panel, steps }) => (
-              <div key={id} className="flex flex-col gap-3 rounded-md border bg-muted/30 p-4">
-                <div className="flex items-center gap-3">
-                  <LogoComponent size={28} />
-                  <div className="min-w-0">
-                    <p className="font-semibold text-sm leading-tight">{name}</p>
-                    <p className="text-xs text-muted-foreground leading-tight mt-0.5">
-                      Opens as: <span className="text-foreground/70">{panel}</span>
-                    </p>
-                  </div>
-                </div>
-                <ol className="text-xs text-muted-foreground space-y-1 pl-1">
-                  {steps.map((step, i) => (
-                    <li key={i}>{i + 1}. {step}</li>
-                  ))}
-                </ol>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="gap-2 w-full mt-auto"
-                  onClick={() => downloadExtension(id)}
-                  data-testid={`button-download-${id}`}
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Download for {name}
-                </Button>
-              </div>
+            {BROWSERS.map((browser) => (
+              <BrowserCard key={browser.id} browser={browser} />
             ))}
           </div>
         </CardContent>

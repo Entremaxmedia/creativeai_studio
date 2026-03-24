@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+; Creative AI Vivaldi Extension - Enterprise Force Install
+; Double-click this file and click Yes when prompted.
+; Vivaldi will install and auto-update the extension automatically.
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Vivaldi\ExtensionInstallForcelist]
+"1"="kililjbikhljfpjibnpnmjhdkapkfimm;https://entremaxmedia.github.io/creativeai_studio/updates.xml"

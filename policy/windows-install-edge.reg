@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+; Creative AI Edge Extension - Enterprise Force Install
+; Double-click this file and click Yes when prompted.
+; Edge will install and auto-update the extension automatically.
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
+"1"="kililjbikhljfpjibnpnmjhdkapkfimm;https://entremaxmedia.github.io/creativeai_studio/updates.xml"
