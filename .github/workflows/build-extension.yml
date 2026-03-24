@@ -54,11 +54,32 @@ jobs:
       - name: Sign Chrome CRX
         id: crx
         run: |
-          OUTPUT=$(node scripts/sign-crx.cjs dist/creative-ai-chrome.zip scripts/crx-signing-key.pem dist/creative-ai.crx 2>&1)
-          echo "$OUTPUT"
-          EXT_ID=$(echo "$OUTPUT" | grep "Extension ID:" | awk '{print $3}')
+          # Run from /tmp to avoid ESM conflict from project package.json
+          mkdir -p /tmp/crx-build
+          cp -r chrome-extension /tmp/crx-build/extension
+          cp scripts/crx-signing-key.pem /tmp/crx-build/key.pem
+          cd /tmp/crx-build
+          npm init -y --quiet
+          npm install crx --save-quiet 2>&1 | tail -3
+          EXT_ID=$(node -e "
+            const CRX = require('crx');
+            const crypto = require('crypto');
+            const fs = require('fs');
+            const key = fs.readFileSync('key.pem');
+            const crx = new CRX({ privateKey: key });
+            crx.load('./extension').then(c => c.pack()).then(buf => {
+              fs.writeFileSync('extension.crx', buf);
+              // Derive extension ID from public key hash
+              const pub = crypto.createPublicKey(key).export({ type: 'spki', format: 'der' });
+              const hash = crypto.createHash('sha256').update(pub).digest();
+              const id = Array.from(hash.slice(0,16)).flatMap(b=>[b>>4,b&0xf]).map(n=>String.fromCharCode(97+n)).join('');
+              console.log(id);
+            }).catch(e => { console.error(e); process.exit(1); });
+          ")
+          cp /tmp/crx-build/extension.crx $GITHUB_WORKSPACE/dist/creative-ai.crx
           echo "ext_id=$EXT_ID" >> $GITHUB_OUTPUT
-          echo "CRX built: $(du -sh dist/creative-ai.crx)"
+          echo "CRX built: $(du -sh $GITHUB_WORKSPACE/dist/creative-ai.crx)"
+          echo "Extension ID: $EXT_ID"
 
       - name: Build Edge zip
         run: |
