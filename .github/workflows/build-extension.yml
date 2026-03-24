@@ -56,11 +56,27 @@ jobs:
         env:
           PRIVATE_KEY: ${{ secrets.CRX_PRIVATE_KEY }}
         run: |
-          printf '%s\n' "$PRIVATE_KEY" > /tmp/key.pem
-          sed -i 's/\r//' /tmp/key.pem
-          OUTPUT=$(node scripts/sign-crx.cjs dist/creative-ai-chrome.zip /tmp/key.pem dist/creative-ai.crx)
-          rm -f /tmp/key.pem
+          printf '%s\n' "$PRIVATE_KEY" > /tmp/raw.pem
+          sed -i 's/\r//' /tmp/raw.pem
+          echo "Raw key lines: $(wc -l < /tmp/raw.pem)"
+          echo "Raw key header: $(head -1 /tmp/raw.pem)"
+          # Normalize to PKCS8 using openssl (handles PKCS1 and PKCS8 input)
+          if openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in /tmp/raw.pem -out /tmp/key.pem 2>/dev/null; then
+            echo "Converted to PKCS8"
+          else
+            cp /tmp/raw.pem /tmp/key.pem
+            echo "Using raw key as-is"
+          fi
+          echo "Final key lines: $(wc -l < /tmp/key.pem)"
+          echo "Final key header: $(head -1 /tmp/key.pem)"
+          OUTPUT=$(node scripts/sign-crx.cjs dist/creative-ai-chrome.zip /tmp/key.pem dist/creative-ai.crx 2>&1)
+          EXIT_CODE=$?
+          rm -f /tmp/raw.pem /tmp/key.pem
           echo "$OUTPUT"
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "CRX signing failed with exit code $EXIT_CODE"
+            exit $EXIT_CODE
+          fi
           EXT_ID=$(echo "$OUTPUT" | grep "Extension ID:" | awk '{print $3}')
           echo "ext_id=$EXT_ID" >> $GITHUB_OUTPUT
           echo "CRX built: $(du -sh dist/creative-ai.crx)"
