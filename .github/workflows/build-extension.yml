@@ -54,7 +54,7 @@ jobs:
         run: |
           printf '%s\n' "$PRIVATE_KEY" > /tmp/key.pem
           sed -i 's/\r//' /tmp/key.pem
-          node scripts/sign-crx.js dist/creative-ai-chrome.zip /tmp/key.pem dist/creative-ai.crx
+          node scripts/sign-crx.cjs dist/creative-ai-chrome.zip /tmp/key.pem dist/creative-ai.crx
           rm -f /tmp/key.pem
           echo "CRX built: $(du -sh dist/creative-ai.crx)"
 
