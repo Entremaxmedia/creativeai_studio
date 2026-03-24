@@ -24,19 +24,22 @@ jobs:
       - name: Read version from manifest
         id: ver
         run: |
-          VERSION=$(node -p "require('./chrome-extension/manifest.json').version")
+          VERSION=$(python3 -c "import json; print(json.load(open('chrome-extension/manifest.json'))['version'], end='')")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version $VERSION"
 
       - name: Patch manifest with update_url
         run: |
           PAGES_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
-          node -e "
-            const fs = require('fs');
-            const m = JSON.parse(fs.readFileSync('chrome-extension/manifest.json', 'utf8'));
-            m.update_url = '${PAGES_URL}/updates.xml';
-            fs.writeFileSync('chrome-extension/manifest.json', JSON.stringify(m, null, 2));
-          "
+          python3 - << PYEOF
+import json
+with open('chrome-extension/manifest.json') as f:
+    m = json.load(f)
+m['update_url'] = '$PAGES_URL/updates.xml'
+with open('chrome-extension/manifest.json', 'w') as f:
+    json.dump(m, f, indent=2)
+print("update_url set to:", m['update_url'])
+PYEOF
 
       - name: Install zip
         run: sudo apt-get install -y zip
@@ -65,14 +68,16 @@ jobs:
       - name: Build Edge zip
         run: |
           cp -r chrome-extension /tmp/edge-ext
-          node -e "
-            const fs = require('fs');
-            const m = JSON.parse(fs.readFileSync('/tmp/edge-ext/manifest.json', 'utf8'));
-            delete m.side_panel;
-            m.permissions = m.permissions.filter(p => p !== 'sidePanel');
-            m.action = { ...m.action, default_popup: 'popup.html' };
-            fs.writeFileSync('/tmp/edge-ext/manifest.json', JSON.stringify(m, null, 2));
-          "
+          python3 - << PYEOF
+import json
+with open('/tmp/edge-ext/manifest.json') as f:
+    m = json.load(f)
+m.pop('side_panel', None)
+m['permissions'] = [p for p in m.get('permissions', []) if p != 'sidePanel']
+m.setdefault('action', {})['default_popup'] = 'popup.html'
+with open('/tmp/edge-ext/manifest.json', 'w') as f:
+    json.dump(m, f, indent=2)
+PYEOF
           cd /tmp/edge-ext
           zip -r $GITHUB_WORKSPACE/dist/creative-ai-edge.zip . \
             --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
@@ -80,14 +85,16 @@ jobs:
       - name: Build Opera zip
         run: |
           cp -r chrome-extension /tmp/opera-ext
-          node -e "
-            const fs = require('fs');
-            const m = JSON.parse(fs.readFileSync('/tmp/opera-ext/manifest.json', 'utf8'));
-            delete m.side_panel;
-            m.permissions = m.permissions.filter(p => p !== 'sidePanel');
-            m.action = { ...m.action, default_popup: 'popup.html' };
-            fs.writeFileSync('/tmp/opera-ext/manifest.json', JSON.stringify(m, null, 2));
-          "
+          python3 - << PYEOF
+import json
+with open('/tmp/opera-ext/manifest.json') as f:
+    m = json.load(f)
+m.pop('side_panel', None)
+m['permissions'] = [p for p in m.get('permissions', []) if p != 'sidePanel']
+m.setdefault('action', {})['default_popup'] = 'popup.html'
+with open('/tmp/opera-ext/manifest.json', 'w') as f:
+    json.dump(m, f, indent=2)
+PYEOF
           cd /tmp/opera-ext
           zip -r $GITHUB_WORKSPACE/dist/creative-ai-opera.zip . \
             --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
@@ -98,14 +105,16 @@ jobs:
       - name: Build Safari zip (popup mode)
         run: |
           cp -r chrome-extension /tmp/safari-ext
-          node -e "
-            const fs = require('fs');
-            const m = JSON.parse(fs.readFileSync('/tmp/safari-ext/manifest.json', 'utf8'));
-            delete m.side_panel;
-            m.permissions = m.permissions.filter(p => p !== 'sidePanel');
-            m.action = { ...m.action, default_popup: 'popup.html' };
-            fs.writeFileSync('/tmp/safari-ext/manifest.json', JSON.stringify(m, null, 2));
-          "
+          python3 - << PYEOF
+import json
+with open('/tmp/safari-ext/manifest.json') as f:
+    m = json.load(f)
+m.pop('side_panel', None)
+m['permissions'] = [p for p in m.get('permissions', []) if p != 'sidePanel']
+m.setdefault('action', {})['default_popup'] = 'popup.html'
+with open('/tmp/safari-ext/manifest.json', 'w') as f:
+    json.dump(m, f, indent=2)
+PYEOF
           cd /tmp/safari-ext
           zip -r $GITHUB_WORKSPACE/dist/creative-ai-safari.zip . \
             --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
