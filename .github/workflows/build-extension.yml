@@ -49,13 +49,17 @@ jobs:
             --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
 
       - name: Sign Chrome CRX
+        id: crx
         env:
           PRIVATE_KEY: ${{ secrets.CRX_PRIVATE_KEY }}
         run: |
           printf '%s\n' "$PRIVATE_KEY" > /tmp/key.pem
           sed -i 's/\r//' /tmp/key.pem
-          node scripts/sign-crx.cjs dist/creative-ai-chrome.zip /tmp/key.pem dist/creative-ai.crx
+          OUTPUT=$(node scripts/sign-crx.cjs dist/creative-ai-chrome.zip /tmp/key.pem dist/creative-ai.crx)
           rm -f /tmp/key.pem
+          echo "$OUTPUT"
+          EXT_ID=$(echo "$OUTPUT" | grep "Extension ID:" | awk '{print $3}')
+          echo "ext_id=$EXT_ID" >> $GITHUB_OUTPUT
           echo "CRX built: $(du -sh dist/creative-ai.crx)"
 
       - name: Build Edge zip
@@ -111,16 +115,20 @@ jobs:
           OWNER="${{ github.repository_owner }}"
           REPO="${{ github.event.repository.name }}"
           VERSION="${{ steps.ver.outputs.version }}"
-          EXT_ID="${{ secrets.CHROME_EXTENSION_ID }}"
+          EXT_ID="${{ steps.crx.outputs.ext_id }}"
+          if [ -z "$EXT_ID" ]; then
+            EXT_ID="${{ secrets.CHROME_EXTENSION_ID }}"
+          fi
+          echo "Extension ID: $EXT_ID"
           mkdir -p pages
           cat > pages/updates.xml << XML
-          <?xml version='1.0' encoding='UTF-8'?>
-          <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
-            <app appid='${EXT_ID}'>
-              <updatecheck codebase='https://${OWNER}.github.io/${REPO}/creative-ai.crx' version='${VERSION}' />
-            </app>
-          </gupdate>
-          XML
+<?xml version='1.0' encoding='UTF-8'?>
+<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+  <app appid='${EXT_ID}'>
+    <updatecheck codebase='https://${OWNER}.github.io/${REPO}/creative-ai.crx' version='${VERSION}' />
+  </app>
+</gupdate>
+XML
           cp dist/creative-ai.crx pages/creative-ai.crx
 
       - name: Deploy to GitHub Pages
@@ -132,8 +140,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.ver.outputs.version }}
+          tag_name: v${{ steps.ver.outputs.version }}-build${{ github.run_number }}
           name: "Creative AI Extension v${{ steps.ver.outputs.version }}"
+          make_latest: true
           body: |
             ## Install instructions
 
