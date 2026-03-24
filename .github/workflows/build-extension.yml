@@ -21,28 +21,28 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install zip
+        run: sudo apt-get install -y zip
+
       - name: Read version from manifest
         id: ver
         run: |
-          VERSION=$(python3 -c "import json; print(json.load(open('chrome-extension/manifest.json'))['version'], end='')")
+          VERSION=$(python3 -c "import json; d=json.load(open('chrome-extension/manifest.json')); print(d['version'], end='')")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version $VERSION"
 
       - name: Patch manifest with update_url
+        env:
+          PAGES_URL: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
         run: |
-          PAGES_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
-          python3 - << PYEOF
-import json
-with open('chrome-extension/manifest.json') as f:
-    m = json.load(f)
-m['update_url'] = '$PAGES_URL/updates.xml'
-with open('chrome-extension/manifest.json', 'w') as f:
-    json.dump(m, f, indent=2)
-print("update_url set to:", m['update_url'])
-PYEOF
-
-      - name: Install zip
-        run: sudo apt-get install -y zip
+          python3 -c "
+          import json, os
+          path = 'chrome-extension/manifest.json'
+          m = json.load(open(path))
+          m['update_url'] = os.environ['PAGES_URL'] + '/updates.xml'
+          open(path, 'w').write(json.dumps(m, indent=2))
+          print('update_url set to:', m['update_url'])
+          "
 
       - name: Build Chrome zip
         run: |
@@ -68,16 +68,15 @@ PYEOF
       - name: Build Edge zip
         run: |
           cp -r chrome-extension /tmp/edge-ext
-          python3 - << PYEOF
-import json
-with open('/tmp/edge-ext/manifest.json') as f:
-    m = json.load(f)
-m.pop('side_panel', None)
-m['permissions'] = [p for p in m.get('permissions', []) if p != 'sidePanel']
-m.setdefault('action', {})['default_popup'] = 'popup.html'
-with open('/tmp/edge-ext/manifest.json', 'w') as f:
-    json.dump(m, f, indent=2)
-PYEOF
+          python3 -c "
+          import json
+          path = '/tmp/edge-ext/manifest.json'
+          m = json.load(open(path))
+          m.pop('side_panel', None)
+          m['permissions'] = [p for p in m.get('permissions', []) if p != 'sidePanel']
+          m.setdefault('action', {})['default_popup'] = 'popup.html'
+          open(path, 'w').write(json.dumps(m, indent=2))
+          "
           cd /tmp/edge-ext
           zip -r $GITHUB_WORKSPACE/dist/creative-ai-edge.zip . \
             --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
@@ -85,16 +84,15 @@ PYEOF
       - name: Build Opera zip
         run: |
           cp -r chrome-extension /tmp/opera-ext
-          python3 - << PYEOF
-import json
-with open('/tmp/opera-ext/manifest.json') as f:
-    m = json.load(f)
-m.pop('side_panel', None)
-m['permissions'] = [p for p in m.get('permissions', []) if p != 'sidePanel']
-m.setdefault('action', {})['default_popup'] = 'popup.html'
-with open('/tmp/opera-ext/manifest.json', 'w') as f:
-    json.dump(m, f, indent=2)
-PYEOF
+          python3 -c "
+          import json
+          path = '/tmp/opera-ext/manifest.json'
+          m = json.load(open(path))
+          m.pop('side_panel', None)
+          m['permissions'] = [p for p in m.get('permissions', []) if p != 'sidePanel']
+          m.setdefault('action', {})['default_popup'] = 'popup.html'
+          open(path, 'w').write(json.dumps(m, indent=2))
+          "
           cd /tmp/opera-ext
           zip -r $GITHUB_WORKSPACE/dist/creative-ai-opera.zip . \
             --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
@@ -105,16 +103,15 @@ PYEOF
       - name: Build Safari zip (popup mode)
         run: |
           cp -r chrome-extension /tmp/safari-ext
-          python3 - << PYEOF
-import json
-with open('/tmp/safari-ext/manifest.json') as f:
-    m = json.load(f)
-m.pop('side_panel', None)
-m['permissions'] = [p for p in m.get('permissions', []) if p != 'sidePanel']
-m.setdefault('action', {})['default_popup'] = 'popup.html'
-with open('/tmp/safari-ext/manifest.json', 'w') as f:
-    json.dump(m, f, indent=2)
-PYEOF
+          python3 -c "
+          import json
+          path = '/tmp/safari-ext/manifest.json'
+          m = json.load(open(path))
+          m.pop('side_panel', None)
+          m['permissions'] = [p for p in m.get('permissions', []) if p != 'sidePanel']
+          m.setdefault('action', {})['default_popup'] = 'popup.html'
+          open(path, 'w').write(json.dumps(m, indent=2))
+          "
           cd /tmp/safari-ext
           zip -r $GITHUB_WORKSPACE/dist/creative-ai-safari.zip . \
             --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
@@ -125,19 +122,11 @@ PYEOF
           REPO="${{ github.event.repository.name }}"
           VERSION="${{ steps.ver.outputs.version }}"
           EXT_ID="${{ steps.crx.outputs.ext_id }}"
-          if [ -z "$EXT_ID" ]; then
-            EXT_ID="${{ secrets.CHROME_EXTENSION_ID }}"
-          fi
+          if [ -z "$EXT_ID" ]; then EXT_ID="${{ secrets.CHROME_EXTENSION_ID }}"; fi
           echo "Extension ID: $EXT_ID"
           mkdir -p pages
-          cat > pages/updates.xml << XML
-<?xml version='1.0' encoding='UTF-8'?>
-<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
-  <app appid='${EXT_ID}'>
-    <updatecheck codebase='https://${OWNER}.github.io/${REPO}/creative-ai.crx' version='${VERSION}' />
-  </app>
-</gupdate>
-XML
+          printf '<?xml version='"'"'1.0'"'"' encoding='"'"'UTF-8'"'"'?>\n<gupdate xmlns='"'"'http://www.google.com/update2/response'"'"' protocol='"'"'2.0'"'"'>\n  <app appid='"'"'%s'"'"'>\n    <updatecheck codebase='"'"'https://%s.github.io/%s/creative-ai.crx'"'"' version='"'"'%s'"'"' />\n  </app>\n</gupdate>\n' "$EXT_ID" "$OWNER" "$REPO" "$VERSION" > pages/updates.xml
+          cat pages/updates.xml
           cp dist/creative-ai.crx pages/creative-ai.crx
 
       - name: Deploy to GitHub Pages
@@ -155,14 +144,14 @@ XML
           body: |
             ## Install instructions
 
-            **Auto-updating install (Chrome/Edge/Vivaldi):**
-            Download `creative-ai.crx`, open `chrome://extensions`, enable Developer mode, then drag and drop the `.crx` file onto the page. Chrome will auto-update this install silently.
+            **Auto-updating CRX (Chrome / Vivaldi / Edge):**
+            Download `creative-ai.crx`, open `chrome://extensions`, enable Developer mode, drag-and-drop the file. Chrome auto-updates silently.
 
             **Manual install (all browsers):**
-            Download the `.zip` for your browser, extract it, go to `chrome://extensions` (or equivalent), enable Developer mode, click "Load unpacked", and select the extracted folder.
+            Download the zip for your browser, extract, go to extensions page, enable Developer mode, click "Load unpacked".
 
             **Safari:**
-            Download `creative-ai-safari.zip`, extract it, then run `xcrun safari-web-extension-converter ./creative-ai-safari` in Terminal to convert it for Safari via Xcode.
+            Download `creative-ai-safari.zip`, extract, then run `xcrun safari-web-extension-converter ./creative-ai-safari` in Terminal.
           files: |
             dist/creative-ai-chrome.zip
             dist/creative-ai-edge.zip
