@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+; Creative AI Chrome Extension - Enterprise Force Install
+; Double-click this file and click Yes when prompted.
+; Chrome will install and auto-update the extension automatically.
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist]
+"1"="kililjbikhljfpjibnpnmjhdkapkfimm;https://entremaxmedia.github.io/creativeai_studio/updates.xml"

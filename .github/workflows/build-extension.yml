@@ -51,35 +51,20 @@ jobs:
           zip -r ../dist/creative-ai-chrome.zip . \
             --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
 
+      - name: Read signing key
+        id: read_key
+        run: |
+          echo "key<<KEYEOF" >> $GITHUB_OUTPUT
+          cat scripts/crx-signing-key.pem >> $GITHUB_OUTPUT
+          echo "KEYEOF" >> $GITHUB_OUTPUT
+
       - name: Sign Chrome CRX
         id: crx
-        run: |
-          # Run from /tmp to avoid ESM conflict from project package.json
-          mkdir -p /tmp/crx-build
-          cp -r chrome-extension /tmp/crx-build/extension
-          cp scripts/crx-signing-key.pem /tmp/crx-build/key.pem
-          cd /tmp/crx-build
-          npm init -y --quiet
-          npm install crx --save-quiet 2>&1 | tail -3
-          EXT_ID=$(node -e "
-            const CRX = require('crx');
-            const crypto = require('crypto');
-            const fs = require('fs');
-            const key = fs.readFileSync('key.pem');
-            const crx = new CRX({ privateKey: key });
-            crx.load('./extension').then(c => c.pack()).then(buf => {
-              fs.writeFileSync('extension.crx', buf);
-              // Derive extension ID from public key hash
-              const pub = crypto.createPublicKey(key).export({ type: 'spki', format: 'der' });
-              const hash = crypto.createHash('sha256').update(pub).digest();
-              const id = Array.from(hash.slice(0,16)).flatMap(b=>[b>>4,b&0xf]).map(n=>String.fromCharCode(97+n)).join('');
-              console.log(id);
-            }).catch(e => { console.error(e); process.exit(1); });
-          ")
-          cp /tmp/crx-build/extension.crx $GITHUB_WORKSPACE/dist/creative-ai.crx
-          echo "ext_id=$EXT_ID" >> $GITHUB_OUTPUT
-          echo "CRX built: $(du -sh $GITHUB_WORKSPACE/dist/creative-ai.crx)"
-          echo "Extension ID: $EXT_ID"
+        uses: cardinalby/webext-buildtools-chrome-crx-action@v2
+        with:
+          zipFilePath: dist/creative-ai-chrome.zip
+          crxFilePath: dist/creative-ai.crx
+          privateKey: ${{ steps.read_key.outputs.key }}
 
       - name: Build Edge zip
         run: |
@@ -134,14 +119,21 @@ jobs:
 
       - name: Generate updates.xml and prepare GitHub Pages
         run: |
-          OWNER="${{ github.repository_owner }}"
+          EXT_ID="kililjbikhljfpjibnpnmjhdkapkfimm"
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           REPO="${{ github.event.repository.name }}"
           VERSION="${{ steps.ver.outputs.version }}"
-          EXT_ID="${{ steps.crx.outputs.ext_id }}"
-          if [ -z "$EXT_ID" ]; then EXT_ID="${{ secrets.CHROME_EXTENSION_ID }}"; fi
           echo "Extension ID: $EXT_ID"
+          echo "Pages URL: https://$OWNER.github.io/$REPO/"
           mkdir -p pages
-          printf '<?xml version='"'"'1.0'"'"' encoding='"'"'UTF-8'"'"'?>\n<gupdate xmlns='"'"'http://www.google.com/update2/response'"'"' protocol='"'"'2.0'"'"'>\n  <app appid='"'"'%s'"'"'>\n    <updatecheck codebase='"'"'https://%s.github.io/%s/creative-ai.crx'"'"' version='"'"'%s'"'"' />\n  </app>\n</gupdate>\n' "$EXT_ID" "$OWNER" "$REPO" "$VERSION" > pages/updates.xml
+          cat > pages/updates.xml << EOF
+          <?xml version='1.0' encoding='UTF-8'?>
+          <gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+            <app appid='$EXT_ID'>
+              <updatecheck codebase='https://$OWNER.github.io/$REPO/creative-ai.crx' version='$VERSION' />
+            </app>
+          </gupdate>
+          EOF
           cat pages/updates.xml
           cp dist/creative-ai.crx pages/creative-ai.crx
 
@@ -151,6 +143,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./pages
 
+      - name: Copy policy files to dist
+        run: cp policy/windows-install.reg policy/mac-install.sh dist/
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -158,16 +153,18 @@ jobs:
           name: "Creative AI Extension v${{ steps.ver.outputs.version }}"
           make_latest: true
           body: |
-            ## Install instructions
+            ## Team Install (one-time per machine, then auto-updates forever)
 
-            **Auto-updating CRX (Chrome / Vivaldi / Edge):**
-            Download `creative-ai.crx`, open `chrome://extensions`, enable Developer mode, drag-and-drop the file. Chrome auto-updates silently.
+            **Windows:** Download `windows-install.reg`, double-click it, click Yes. Done.
 
-            **Manual install (all browsers):**
-            Download the zip for your browser, extract, go to extensions page, enable Developer mode, click "Load unpacked".
+            **Mac:** Download `mac-install.sh`, open Terminal, run `bash ~/Downloads/mac-install.sh`. Done.
 
-            **Safari:**
-            Download `creative-ai-safari.zip`, extract, then run `xcrun safari-web-extension-converter ./creative-ai-safari` in Terminal.
+            After running the script once, quit Chrome and reopen it. The extension installs automatically and silently updates whenever a new version is released.
+
+            ---
+
+            **Manual install (no auto-update):**
+            Download the zip for your browser, extract, go to extensions, enable Developer mode, click "Load unpacked".
           files: |
             dist/creative-ai-chrome.zip
             dist/creative-ai-edge.zip
@@ -175,3 +172,5 @@ jobs:
             dist/creative-ai-vivaldi.zip
             dist/creative-ai-safari.zip
             dist/creative-ai.crx
+            dist/windows-install.reg
+            dist/mac-install.sh
