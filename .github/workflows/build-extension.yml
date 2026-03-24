@@ -49,8 +49,11 @@ jobs:
             --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
 
       - name: Sign Chrome CRX
+        env:
+          PRIVATE_KEY: ${{ secrets.CRX_PRIVATE_KEY }}
         run: |
-          echo "${{ secrets.CRX_PRIVATE_KEY }}" > /tmp/key.pem
+          printf '%s\n' "$PRIVATE_KEY" > /tmp/key.pem
+          sed -i 's/\r//' /tmp/key.pem
           google-chrome-stable \
             --pack-extension="$(pwd)/chrome-extension" \
             --pack-extension-key=/tmp/key.pem \
