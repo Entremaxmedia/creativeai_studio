@@ -2290,7 +2290,7 @@ ${referenceImages && referenceImages.length > 0
                       const filepath = path.join(uploadsDir, filename);
                       fsSync.writeFileSync(filepath, saveBuffer);
                       const host = req.get('host') || 'localhost:5000';
-                      const protocol = process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http');
+                      const protocol = req.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http'));
                       const publicUrl = `${protocol}://${host}/uploads/${filename}`;
                       referenceImageUrls.push(publicUrl);
                       console.log(`[GPT Image 1.5] Saved reference image locally: ${publicUrl}`);
@@ -2660,7 +2660,7 @@ ${referenceImages && referenceImages.length > 0
                     fsSync.writeFileSync(filepath, img.buffer);
                     
                     const host = req.get('host') || 'localhost:5000';
-                    const protocol = process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http');
+                    const protocol = req.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http'));
                     const publicUrl = `${protocol}://${host}/uploads/${filename}`;
                     referenceImageUrls.push(publicUrl);
                     console.log(`[Nano Banana Pro] Saved reference image: ${publicUrl}`);
@@ -2873,7 +2873,7 @@ ${referenceImages && referenceImages.length > 0
                     const filepath = path.join(uploadsDir, filename);
                     fsSync.writeFileSync(filepath, img.buffer);
                     const host = req.get('host') || 'localhost:5000';
-                    const protocol = process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http');
+                    const protocol = req.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http'));
                     const publicUrl = `${protocol}://${host}/uploads/${filename}`;
                     referenceImageUrls2.push(publicUrl);
                     console.log(`[Nano Banana 2] Saved reference image: ${publicUrl}`);
@@ -3607,7 +3607,7 @@ Apply the requested adjustments to this image while maintaining the overall styl
             const filepath = path.join(uploadsDir, filename);
             fsSync.writeFileSync(filepath, saveBuffer);
             const host = req.get('host') || 'localhost:5000';
-            const protocol = process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http');
+            const protocol = req.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http'));
             publicUrl = `${protocol}://${host}/uploads/${filename}`;
             console.log(`[GPT Image 1.5 Adjust] Saved image locally: ${publicUrl}`);
           }
@@ -4859,7 +4859,7 @@ Return valid JSON:
           fs.mkdirSync(uploadsDir, { recursive: true });
         }
         const host = req.get('host') || 'localhost:5000';
-        const protocol = process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http');
+        const protocol = req.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http'));
         for (const imgFile of referenceImageFiles) {
           const timestamp = Date.now();
           const randomStr = Math.random().toString(36).substring(7);
@@ -5411,7 +5411,7 @@ Return valid JSON:
         
         // Generate public URL
         const host = req.get('host') || 'localhost:5000';
-        const protocol = process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http');
+        const protocol = req.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http'));
         referenceImageUrl = `${protocol}://${host}/uploads/${filename}`;
         
         // Also store base64 for Veo (which uses base64)
@@ -5960,7 +5960,7 @@ Return valid JSON:
         fs.writeFileSync(filepath, imgFile.buffer);
         
         const host = req.get('host') || 'localhost:5000';
-        const protocol = process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http');
+        const protocol = req.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http'));
         const imageUrl = `${protocol}://${host}/uploads/${filename}`;
         
         referenceImageUrls.push(imageUrl);
@@ -5979,7 +5979,7 @@ Return valid JSON:
         fs.writeFileSync(filepath, referenceVideo.buffer);
         
         const host = req.get('host') || 'localhost:5000';
-        const protocol = process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http');
+        const protocol = req.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http'));
         referenceVideoUrl = `${protocol}://${host}/uploads/${filename}`;
       }
       
