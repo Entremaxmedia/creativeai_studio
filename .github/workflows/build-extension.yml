@@ -49,11 +49,15 @@ jobs:
             --exclude "generate-icons.js" --exclude "*.DS_Store" --exclude "README.md"
 
       - name: Sign Chrome CRX
-        uses: cardinalby/webext-buildtools-chrome-crx-action@v2
-        with:
-          zipFilePath: dist/creative-ai-chrome.zip
-          crxFilePath: dist/creative-ai.crx
-          privateKey: ${{ secrets.CRX_PRIVATE_KEY }}
+        run: |
+          echo "${{ secrets.CRX_PRIVATE_KEY }}" > /tmp/key.pem
+          google-chrome-stable \
+            --pack-extension="$(pwd)/chrome-extension" \
+            --pack-extension-key=/tmp/key.pem \
+            --no-sandbox 2>&1
+          mv "$(pwd)/chrome-extension.crx" dist/creative-ai.crx
+          rm -f /tmp/key.pem
+          echo "CRX built: $(du -sh dist/creative-ai.crx)"
 
       - name: Build Edge zip
         run: |
